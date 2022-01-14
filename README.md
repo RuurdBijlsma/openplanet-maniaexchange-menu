@@ -1,6 +1,6 @@
 # ItemExchange for Openplanet
 
-![plugin screenshot](https://github.com/ruurdbijlsma/op-item-exchange/blob/master/.gh/IXScreenshot.png?raw=true)
+![plugin screenshot](https://github.com/ruurdbijlsma/tm-item-exchange/blob/master/.gh/IXScreenshot.png?raw=true)
 
 [![Version](https://img.shields.io/badge/dynamic/json?color=pink&label=Version&query=version&url=https%3A%2F%2Fopenplanet.nl%2Fapi%2Ffile%2F154)](https://openplanet.nl/files/154)
 [![Total Downloads](https://img.shields.io/badge/dynamic/json?color=green&label=Downloads&query=downloads&url=https%3A%2F%2Fopenplanet.nl%2Fapi%2Ffile%2F154)](https://openplanet.nl/files/154)
