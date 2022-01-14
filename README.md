@@ -1,5 +1,7 @@
 # ItemExchange for Openplanet
 
+Demo: https://youtu.be/Nbecs5s51EY
+
 ![plugin screenshot](https://github.com/ruurdbijlsma/tm-item-exchange/blob/main/.gh/IXScreenshot.png?raw=true)
 
 [![Version](https://img.shields.io/badge/dynamic/json?color=pink&label=Version&query=version&url=https%3A%2F%2Fopenplanet.nl%2Fapi%2Ffile%2F154)](https://openplanet.nl/files/154)
