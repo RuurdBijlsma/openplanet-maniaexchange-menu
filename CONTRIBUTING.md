@@ -1,4 +1,4 @@
-# Contributing guide for ManiaExchange Menu
+# Contributing guide for ItemExchange Menu
 
 ## Where to clone the repo ?
 

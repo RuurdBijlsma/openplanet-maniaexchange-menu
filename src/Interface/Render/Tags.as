@@ -1,6 +1,6 @@
 namespace IfaceRender
 {
-    const vec4 TAG_COLOR         = vec4( 30/255.0f,  32/255.0f,  33/255.0f, 1);
+    const vec4 TAG_COLOR = vec4( 30/255.0f,  32/255.0f,  33/255.0f, 1);
 
     const vec2 TAG_PADDING = vec2(8, 4);
     const float TAG_ROUNDING = 4;
@@ -27,7 +27,7 @@ namespace IfaceRender
         DrawTag(UI::GetItemRect(), text, color);
     }
     
-    void MapTag(MX::MapTag@ tag)
+    void ItemTag(IX::ItemTag@ tag)
     {
         vec4 color = Text::ParseHexColor(tag.Color);
         IfaceRender::Tag(tag.Name, color);

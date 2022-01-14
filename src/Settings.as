@@ -1,3 +1,8 @@
+[Setting name="Main screen offset left" category="Multi-monitor"]
+int screenOffsetLeft = 1920;
+[Setting name="Main screen offset top" category="Multi-monitor"]
+int screenOffsetTop = 0;
+
 [Setting name="Use colored map name" category="UI"]
 bool Setting_ColoredMapName = true;
 

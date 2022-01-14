@@ -1,7 +1,7 @@
 class HomePageTab : Tab {
-    Resources::Font@ g_fontTitle = Resources::GetFont("DroidSans-Bold.ttf", 32);
-    Resources::Font@ g_fontHeader = Resources::GetFont("DroidSans-Bold.ttf", 24);
-    Resources::Font@ g_fontHeader2 = Resources::GetFont("DroidSans-Bold.ttf", 18);
+    Resources::Font@ g_fontTitle = Resources::GetFont("Oswald-Regular.ttf", 32);
+    Resources::Font@ g_fontHeader = Resources::GetFont("Oswald-Regular.ttf", 24);
+    Resources::Font@ g_fontHeader2 = Resources::GetFont("Oswald-Regular.ttf", 18);
 
     string GetLabel() override { return Icons::Home; }
 
@@ -13,11 +13,7 @@ class HomePageTab : Tab {
 
         UI::BeginChild("Summary", vec2(width,0));
 
-#if TMNEXT
-        auto logo = Images::CachedFromURL("https://images.mania.exchange/logos/tmx/square_sm.png");
-#else
-        auto logo = Images::CachedFromURL("https://media.discordapp.net/attachments/373779861157838850/725132923795275806/mx_full.png");
-#endif
+        auto logo = Images::CachedFromURL("https://images.mania.exchange/logos/ix/square_sm.png");
         if (logo.m_texture !is null){
             vec2 logoSize = logo.m_texture.GetSize();
             UI::Image(logo.m_texture, vec2(
@@ -33,27 +29,9 @@ class HomePageTab : Tab {
         UI::Text("Welcome to " + pluginName);
         UI::PopFont();
         UI::PushFont(g_fontHeader2);
-#if MP4
-        string actualRepo = "Unknown";
-        if (MXURL.StartsWith("tm.")) actualRepo = "Trackmania";
-        else if (MXURL.StartsWith("sm.")) actualRepo = "Shootmania";
-        UI::TextDisabled("The content network for "+actualRepo+" - driven by the community.");
-#else
         UI::TextDisabled("The content network for Trackmania - driven by the community.");
-#endif
         UI::PopFont();
-#if MP4
-        
-        UI::TextDisabled("Current repository: " + MXURL + "    " + Icons::InfoCircle);
-        if (UI::IsItemHovered()) {
-            UI::BeginTooltip();
-            UI::Text("You can change the repository on the plugin settings.");
-            UI::Text("\\$f90" + Icons::ExclamationCircle + " \\$zYou need to reload the plugin to apply the changes.");
-            UI::Separator();
-            UI::Text("To reload the plugin, Select 'Developer' then 'Reload plugin' then 'ManiaExchange'.");
-            UI::EndTooltip();
-        }
-#endif
+
         UI::Separator();
 
         UI::BeginTabBar("HomePageTabs");

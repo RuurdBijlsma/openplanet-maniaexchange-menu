@@ -19,7 +19,7 @@ namespace HomePageTabRender {
 
         UI::Text(pluginColor + Icons::Plug);
         UI::SameLine();
-        UI::PushFont(Header);
+        UI::PushFont(g_fontHeader3);
         UI::Text("Plugin");
         UI::PopFont();
         UI::Text("Made by \\$777" + Meta::ExecutingPlugin().get_Author());
@@ -42,7 +42,7 @@ namespace HomePageTabRender {
         UI::Separator();
         UI::Text("\\$f39" + Icons::Heartbeat);
         UI::SameLine();
-        UI::PushFont(Header);
+        UI::PushFont(g_fontHeader3);
         UI::Text("Openplanet");
         UI::PopFont();
         UI::Text("Version \\$777" + Meta::OpenplanetBuildInfo());

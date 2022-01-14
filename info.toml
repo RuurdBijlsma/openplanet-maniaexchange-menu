@@ -1,11 +1,10 @@
 [meta]
-name = "ManiaExchange"
-author = "Greep"
+name = "ItemExchange"
+author = "RuteNL"
 category = "TMX"
 perms = "paid"
-siteid = 154
 
-version = "1.0.2"
+version = "1.0.1"
 
 [script]
 imports = [ "Icons.as", "Permissions.as", "Formatting.as", "Dialogs.as" ]

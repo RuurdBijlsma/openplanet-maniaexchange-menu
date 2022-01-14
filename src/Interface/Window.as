@@ -1,5 +1,5 @@
-class Window{
-    bool isOpened = false;
+class Window {
+    bool isOpened = true;
 
     array<Tab@> tabs;
     Tab@ activeTab;
@@ -7,14 +7,7 @@ class Window{
 
     Window(){
         AddTab(HomePageTab());
-        AddTab(MostAwardedTab());
-        AddTab(FeaturedMapsTab());
-        AddTab(TagsListTab());
-        AddTab(LatestMapsTab());
-        AddTab(RecentlyAwardedTab());
-        AddTab(TOTDTab());
-        AddTab(MapPackListTab());
-        AddTab(SearchTab());
+        AddTab(TestTab());
     }
 
     void AddTab(Tab@ tab, bool select = false){
@@ -97,4 +90,4 @@ class Window{
 
 }
 
-Window mxMenu;
+Window ixMenu;
