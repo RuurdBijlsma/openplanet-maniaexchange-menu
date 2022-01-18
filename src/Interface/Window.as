@@ -1,11 +1,17 @@
 class Window {
+    Resources::Font@ g_fontTitle = Resources::GetFont("Oswald-Regular.ttf", 32);
+    Resources::Font@ g_fontRegularHeader = Resources::GetFont("Oswald-Regular.ttf", 32);
+    Resources::Font@ g_fontBold = Resources::GetFont("DroidSans-Bold.ttf", 16);
+    Resources::Font@ g_fontHeader = Resources::GetFont("DroidSans-Bold.ttf", 24);
+    Resources::Font@ g_fontHeader2 = Resources::GetFont("DroidSans-Bold.ttf", 18);
     bool isOpened = true;
+    bool isInEditor = false;
 
     array<Tab@> tabs;
     Tab@ activeTab;
     Tab@ c_lastActiveTab;
 
-    Window(){
+    Window() {
         AddTab(HomePageTab());
         AddTab(TestTab());
     }
@@ -19,6 +25,9 @@ class Window {
 
     void Render(){
         if(!isOpened) return;
+        CTrackMania@ app = cast<CTrackMania>(GetApp());
+        auto editor = cast<CGameCtnEditorCommon@>(app.Editor);
+        isInEditor = editor !is null;
 
         UI::PushStyleColor(UI::Col::WindowBg,vec4(0,0,0,1));
 

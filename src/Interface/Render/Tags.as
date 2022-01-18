@@ -2,7 +2,7 @@ namespace IfaceRender
 {
     const vec4 TAG_COLOR = vec4( 30/255.0f,  32/255.0f,  33/255.0f, 1);
 
-    const vec2 TAG_PADDING = vec2(8, 4);
+    const vec2 TAG_PADDING = vec2(8,  2);
     const float TAG_ROUNDING = 4;
 
     vec4 DrawTag(const vec4 &in rect, const string &in text, const vec4 &in color = TAG_COLOR)
@@ -29,6 +29,9 @@ namespace IfaceRender
     
     void ItemTag(IX::ItemTag@ tag)
     {
+        if(tag.Color == ""){
+            tag.Color = '#333333';
+        }
         vec4 color = Text::ParseHexColor(tag.Color);
         IfaceRender::Tag(tag.Name, color);
     }

@@ -17,7 +17,7 @@ class CachedImage
             @m_texture = null;
         }
     }
-}
+};
 
 namespace Images
 {

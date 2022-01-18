@@ -1,7 +1,7 @@
 string pluginName = "ItemExchange";
 string shortMXName = "IX";
 string pluginColor = "\\$9fc";
-vec4 pluginColorVec = vec4(0.3, 0.7, 0.4, 1);
+vec4 pluginColorVec = vec4(0.51, 0.47, 0.05, 1);
 string gameName = "TMNEXT";
 string MXURL = "item.exchange";
 

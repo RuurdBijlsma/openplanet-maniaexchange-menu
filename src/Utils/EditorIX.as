@@ -2,6 +2,7 @@ class EditorIX {
     Import::Library@ lib = null;
     Import::Function@ clickFun = null;
     Import::Function@ mousePosFun = null;
+    bool isImporting = false;
     string downloadFolder = '';
 
     EditorIX (){
@@ -27,6 +28,19 @@ class EditorIX {
     }
 
     bool ImportItem(IX::Item@ item, string desiredItemLocation = '') {
+        int waitTime = 0;
+        while(isImporting) { 
+            waitTime++;
+            yield();
+            warn("Trying to import an item while another is being imported!");
+            // timeout after 5s
+            if(waitTime > 500){
+                UI::ShowNotification("Couldn't import item, importer is busy.");
+                return false;
+            }
+        }
+        isImporting = true;
+
         string itemFolder = item.Username + '/';
         if(!IO::FolderExists(downloadFolder + itemFolder)) IO::CreateFolder(downloadFolder + itemFolder);
         if(item.SetID != 0) {
@@ -43,6 +57,8 @@ class EditorIX {
             desiredItemLocation = itemFolder + item.FileName;
 
         LoadItem(filePath, desiredItemLocation);
+
+        isImporting = false;
         return true;
     }
 

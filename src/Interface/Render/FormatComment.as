@@ -1,6 +1,15 @@
-namespace IfaceRender
-{
-    void MXComment(string comment){
+namespace IfaceRender {
+    enum EPartType { Text, Set, Item };
+    class TextPart {
+        string value;
+        EPartType type;
+        TextPart(string value, EPartType type){
+            this.value = value;
+            this.type = type;
+        }
+    };
+
+    void IXComment(string comment){
         string formatted = "";
 
         formatted =
@@ -43,6 +52,69 @@ namespace IfaceRender
         // align replacement
         formatted = Regex::Replace(formatted, "\\[align=([^\\]]*)\\]([^\\[]*)\\[\\/align\\]", "$2");
 
-        UI::Markdown(formatted);
+        // Find set and item ids in text formatted like so: [item-12345] [set-123]
+        auto itemParts = (formatted + ' ').Split('[item-');
+        TextPart@[] itemTextParts = {TextPart(itemParts[0], EPartType::Text)};
+        for(uint i = 1; i < itemParts.Length; i++) {
+            auto part = itemParts[i];
+            string itemID = '';
+            string text = part;
+            if(part.Contains(']')){
+                auto parts = part.Split(']');
+                itemID = parts[0];
+                if(parts.Length > 1){
+                    text = string::Join(parts, ']').SubStr(itemID.Length + 1);
+                } else {
+                    text = "";
+                }
+            }
+            if(itemID != '')
+                itemTextParts.InsertLast(TextPart(itemID, EPartType::Item));
+            itemTextParts.InsertLast(TextPart(text, EPartType::Text));
+        }
+
+        TextPart@[] textParts = {};
+        for(uint i = 0; i < itemTextParts.Length; i++) {
+            if(itemTextParts[i].type == EPartType::Text) {
+                // Look for sets in text
+                auto text = itemTextParts[i].value;
+                auto setParts = text.Split('[set-');
+                textParts.InsertLast(TextPart(setParts[0], EPartType::Text));
+                for(uint j = 1; j < setParts.Length; j++) {
+                    auto part = setParts[j];
+                    string setID = '';
+                    string text = part;
+                    if(part.Contains(']')){
+                        auto parts = part.Split(']');
+                        setID = parts[0];
+                        if(parts.Length > 1){
+                            text = string::Join(parts, ']').SubStr(setID.Length + 1);
+                        } else {
+                            text = "";
+                        }
+                    }
+                    if(setID != '')
+                        textParts.InsertLast(TextPart(setID, EPartType::Set));
+                    textParts.InsertLast(TextPart(text, EPartType::Text));
+                }
+            } else { 
+                textParts.InsertLast(itemTextParts[i]);
+            }
+        }
+
+        for(uint i = 0; i < textParts.Length; i++) {
+            auto part = textParts[i];
+            if(part.type == EPartType::Item) {
+                if(UI::CyanButton('item ' + part.value)){
+                    print("nice item");
+                }
+            } else if(part.type == EPartType::Set) {
+                if(UI::GreenButton('set ' + part.value)){
+                    print("nice set");
+                }
+            } else if(part.value.Trim().Length > 0) {
+                UI::Markdown(part.value);
+            }
+        }
     }
 }

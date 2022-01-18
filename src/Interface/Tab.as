@@ -21,4 +21,4 @@ class Tab
     }
 
     void Render() {}
-}
+};

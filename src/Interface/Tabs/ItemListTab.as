@@ -45,7 +45,7 @@ class ItemListTab : Tab {
     void CheckStartRequest()
     {
         // If there's not already a request and the window is appearing, we start a new request
-        if (items.get_Length() == 0 && m_request is null && UI::IsWindowAppearing()) {
+        if (items.Length == 0 && m_request is null && UI::IsWindowAppearing()) {
             StartRequest();
         }
     }
@@ -88,13 +88,14 @@ class ItemListTab : Tab {
         for (uint i = 0; i < jsonItems.Length; i++) {
             items.InsertLast(IX::Item(jsonItems[i]));
         }
+        ixMenu.AddTab(ItemTab(items[0]), true); // for dev
     }
 
     void RenderHeader(){}
 
     void Clear()
     {
-        items.RemoveRange(0, items.get_Length());
+        items.RemoveRange(0, items.Length);
         totalItems = 0;
     }
 
@@ -115,7 +116,7 @@ class ItemListTab : Tab {
             string Hourglass = (HourGlassValue == 0 ? Icons::HourglassStart : (HourGlassValue == 1 ? Icons::HourglassHalf : Icons::HourglassEnd));
             UI::Text(Hourglass + " Loading...");
         } else {
-            if (items.get_Length() == 0) {
+            if (items.Length == 0) {
                 UI::Text("No items found.");
                 return;
             }
@@ -132,14 +133,14 @@ class ItemListTab : Tab {
                 UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 90);
                 UI::TableHeadersRow();
                 PopTabStyle();
-                for(uint i = 0; i < items.get_Length(); i++)
+                for(uint i = 0; i < items.Length; i++)
                 {
                     UI::PushID("ResItem"+i);
                     IX::Item@ item = items[i];
-                    IfaceRender::ItemResult(item);
+                    IfaceRender::ItemRow(item);
                     UI::PopID();
                 }
-                if (m_request !is null && totalItems > items.get_Length()) {
+                if (m_request !is null && totalItems > items.Length) {
                     UI::TableNextRow();
                     UI::TableSetColumnIndex(0);
                     UI::Text(Icons::HourglassEnd + " Loading...");
@@ -153,4 +154,4 @@ class ItemListTab : Tab {
             UI::EndChild();
         }
     }
-}
+};

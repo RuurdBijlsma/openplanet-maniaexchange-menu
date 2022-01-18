@@ -1,5 +1,5 @@
 namespace IfaceRender {
-    void ItemResult(IX::Item@ item){
+    void ItemRow(IX::Item@ item){
         UI::TableNextRow();
         UI::TableSetColumnIndex(0);
 
@@ -18,23 +18,18 @@ namespace IfaceRender {
         // Item Type Icon
         UI::SetNextWindowContentSize(50, 50);
         auto dl = UI::GetWindowDrawList();
-        if(item.Type == EItemType::Ornament){
-            UI::Text(Icons::Tree);
-        } else if(item.Type == EItemType::Block){
-            UI::Text(Icons::Cube);
-        }
+        IfaceRender::ItemType(item);
         UI::SameLine();
 
         // Item Name
         UI::Text(item.Name);
 
         // Item Tags on newline
-        if (item.Tags.get_Length() == 0) UI::Text("No tags");
-        else if (item.Tags.get_Length() == 1) UI::Text(item.Tags[0].Name);
+        if (item.Tags.Length == 0) UI::Text("No tags");
         else {
             for (uint i = 0; i < item.Tags.Length; i++) {
+                if(i != 0) UI::SameLine();
                 IfaceRender::ItemTag(item.Tags[i]);
-                UI::SameLine();
             }
         }
 
@@ -52,15 +47,9 @@ namespace IfaceRender {
 
         UI::TableSetColumnIndex(6);
         if (UI::GreenButton(Icons::InfoCircle)) {
-            ixMenu.AddTab(ItemTab(item.ID), true);
+            ixMenu.AddTab(ItemTab(item), true);
         }
         UI::SameLine();
-        if (UI::CyanButton(Icons::Download)) {
-            startnew(ImportItem, item);
-        }
+        IfaceRender::ImportItemButton(item);
     }
-}
-
-void ImportItem(ref@ item){
-    editorIX.ImportItem(cast<IX::Item@>(item));
 }

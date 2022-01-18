@@ -1,8 +1,4 @@
 class HomePageTab : Tab {
-    Resources::Font@ g_fontTitle = Resources::GetFont("Oswald-Regular.ttf", 32);
-    Resources::Font@ g_fontHeader = Resources::GetFont("Oswald-Regular.ttf", 24);
-    Resources::Font@ g_fontHeader2 = Resources::GetFont("Oswald-Regular.ttf", 18);
-
     string GetLabel() override { return Icons::Home; }
 
     vec4 GetColor() override { return pluginColorVec; }
@@ -25,10 +21,10 @@ class HomePageTab : Tab {
         UI::EndChild();
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
         UI::BeginChild("Description");
-        UI::PushFont(g_fontTitle);
+        UI::PushFont(ixMenu.g_fontTitle);
         UI::Text("Welcome to " + pluginName);
         UI::PopFont();
-        UI::PushFont(g_fontHeader2);
+        UI::PushFont(ixMenu.g_fontHeader2);
         UI::TextDisabled("The content network for Trackmania - driven by the community.");
         UI::PopFont();
 
@@ -46,4 +42,4 @@ class HomePageTab : Tab {
         UI::EndTabBar();
         UI::EndChild();
     }
-}
+};

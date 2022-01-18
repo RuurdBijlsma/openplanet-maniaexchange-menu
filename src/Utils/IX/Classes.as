@@ -73,7 +73,9 @@ namespace IX
                 Score = json["Score"];
                 FileName = json["FileName"];
                 Uploaded = json["Uploaded"];
+                Uploaded = Uploaded.Replace("T", " ");
                 Updated = json["Updated"];
+                Updated = Updated.Replace("T", " ");
                 SetID = json["SetID"];
                 if (json["SetName"].GetType() != Json::Type::Null) SetName = json["SetName"];
                 if (json["Directory"].GetType() != Json::Type::Null) Directory = json["Directory"];
@@ -132,7 +134,9 @@ namespace IX
                 Score = json["Score"];
                 FileName = json["FileName"];
                 Uploaded = json["Uploaded"];
+                Uploaded = Uploaded.Replace("T", " ");
                 Updated = json["Updated"];
+                Updated = Updated.Replace("T", " ");
                 Visible = json["Visible"];
                 Unreleased = json["Unreleased"];
                 FileSize = json["FileSize"];

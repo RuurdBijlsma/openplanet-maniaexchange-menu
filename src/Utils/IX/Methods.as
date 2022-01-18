@@ -136,7 +136,7 @@ namespace IX {
         }
         
         try {
-            for (uint i = 0; i < resNet.get_Length(); i++)
+            for (uint i = 0; i < resNet.Length; i++)
             {
                 int tagID = resNet[i]["ID"];
                 string tagName = resNet[i]["Name"];
@@ -146,7 +146,7 @@ namespace IX {
                 m_itemTags.InsertLast(ItemTag(resNet[i]));
             }
 
-            log(m_itemTags.get_Length() + " tags loaded");
+            log(m_itemTags.Length + " tags loaded");
         } catch {
             mxError("Error while loading tags");
             mxError(pluginName + " API is not responding, it must be down.", true);
