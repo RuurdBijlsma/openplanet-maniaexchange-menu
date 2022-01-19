@@ -64,8 +64,6 @@ class ItemTab : Tab {
         }
         UI::EndTabBar();
 
-        IfaceRender::ImportItemButton(item, true);
-
         UI::EndChild();
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
         UI::BeginChild("ItemHeader");
@@ -123,6 +121,11 @@ class ItemTab : Tab {
                 if(i != 0) UI::SameLine();
                 IfaceRender::ItemTag(item.Tags[i]);
             }
+        }
+
+        if(ixMenu.isInEditor) {
+            UI::Separator();
+            IfaceRender::ImportItemButton(item, true);
         }
 
         if(item.Description != "") {

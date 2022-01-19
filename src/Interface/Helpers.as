@@ -21,7 +21,7 @@ namespace IfaceRender {
 
         string extraText = "";
         if(!loading && showText) {
-            extraText += " Import";
+            extraText += " Import into editor";
         }else if(loading && showText) {
             extraText += " Importing...";
         }

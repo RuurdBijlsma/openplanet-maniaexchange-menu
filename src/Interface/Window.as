@@ -96,7 +96,6 @@ class Window {
         UI::End();
         UI::PopStyleColor(1);
     }
-
-}
+};
 
 Window ixMenu;

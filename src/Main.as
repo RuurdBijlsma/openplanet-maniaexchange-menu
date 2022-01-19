@@ -1,8 +1,9 @@
 ﻿// TODO:
 // Show search results in ui
 // Support blocks
-// finish downloadmanager.as
-// show description on items
+// Show item set contents in ui (try lazy loading to ease on image loading)
+// make import item set button
+// maybe more stuff in download manager
 // MORE STUFF
 
 EditorIX@ editorIX = null;
