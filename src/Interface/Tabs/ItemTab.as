@@ -1,15 +1,38 @@
 class ItemTab : Tab {
     IX::Item@ item;
-    ItemTab(IX::Item@ item){
-        @this.item = item;
+    int ID;
+    EGetStatus status = EGetStatus::Downloading;
+
+    ItemTab(int itemID){
+        this.ID = itemID;
+        downloader.Check('item', ID);
     }
+
     bool CanClose() override { return true; }
-
-    string GetLabel() override { return Icons::Tree + " " + item.Name; }
-
-    vec4 GetColor() override { return pluginColorVec; }
+    string GetLabel() override {
+        if (status == EGetStatus::Error) 
+            return "\\$f00" + Icons::Times + " \\$zError";
+        if (status == EGetStatus::Downloading) 
+            return Icons::Database + " Loading...";
+        return Icons::Tree + " " + item.Name;
+    }
 
     void Render() override {
+        if(status != EGetStatus::Available) {
+            status = downloader.Check('item', ID);
+            if(status == EGetStatus::Error) {
+                UI::Text("\\$f00" + Icons::Times + " \\$zItem not found");
+                return;
+            }
+            if(status == EGetStatus::Downloading) {
+                UI::Text(IfaceRender::GetHourGlass() + " Loading...");
+                return;
+            }
+            if(status == EGetStatus::Available) {
+                @item = downloader.GetItem(ID);
+            }
+        }
+
         float width = (UI::GetWindowSize().x * 0.35) * 0.5;
         vec2 posTop = UI::GetCursorPos();
 
@@ -41,6 +64,7 @@ class ItemTab : Tab {
         }
         UI::EndTabBar();
 
+        IfaceRender::ImportItemButton(item, true);
 
         UI::EndChild();
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
@@ -63,7 +87,6 @@ class ItemTab : Tab {
             UI::PushStyleColor(UI::Col::ButtonActive, buttonBg);
             UI::PushStyleColor(UI::Col::Text, GetColor());
             UI::PushStyleVar(UI::StyleVar::FramePadding, vec2(0, 0));
-            // TODO make set clickable
             if(UI::Button(item.SetName)) {
                 ixMenu.AddTab(ItemSetTab(item.SetID), true);
             }
@@ -72,43 +95,28 @@ class ItemTab : Tab {
         }
 
         UI::Separator();
-        // UI::PushFont(ixMenu.g_fontHeader2);
         UI::Text(Icons::Info + " Information");
-        // UI::PopFont();
         UI::Separator();
 
-        int leftSize = 100;
-        vec2 posTop2 = UI::GetCursorPos();
-        UI::BeginChild("ItemInfoLeft", vec2(leftSize, 0));
-        UI::PushFont(ixMenu.g_fontBold);
-        UI::Text("Item ID:");
-        UI::Text("Uploaded by:");
-        if(item.AuthorLogin != '') UI::Text("Creator Login:");
-        if(item.Updated == item.Uploaded){
-            UI::Text("Uploaded:");
-        } else {
-            UI::Text("Uploaded (Ver.):");
+        IfaceRender::InfoRow("Item ID", tostring(item.ID), 51);
+        IfaceRender::InfoRow("Uploaded by", item.Username, 20);
+        if(item.AuthorLogin != '') {
+            IfaceRender::InfoRow("Creator Login", item.AuthorLogin, 13);
         }
-        UI::Text("Item Type:");
-        UI::Text("Filesize:");
+        if(item.Updated == item.Uploaded){
+            IfaceRender::InfoRow("Uploaded", item.Uploaded, 40);
+        } else {
+            IfaceRender::InfoRow("Uploaded (Ver.)", item.Uploaded + " (" + item.Updated + ")", 1);
+        }
+        IfaceRender::InfoRow("Item Type", tostring(item.Type), 36);
+        IfaceRender::InfoRow("Filesize", tostring(item.FileSize) + ' KB', 54);
+    
+        UI::PushFont(ixMenu.g_fontBold);
         UI::Text("Tags:");
         UI::PopFont();
-        UI::EndChild();
-
-        UI::SetCursorPos(posTop2 + vec2(leftSize + 8, 0));
-
-        UI::BeginChild("ItemInfoRight");
-        UI::Text(tostring(item.ID));
-        UI::Text(item.Username);
-        if(item.AuthorLogin != '') UI::Text(item.AuthorLogin);
-        if(item.Updated == item.Uploaded){
-            UI::Text(item.Uploaded);
-        } else {
-            UI::Text(item.Uploaded + " (" + item.Updated + ")");
-        }
-        UI::Text(tostring(item.Type));
-        UI::Text(tostring(item.FileSize) + ' KB');
-        
+        UI::SameLine();
+        UI::Dummy(vec2(74, 0));
+        UI::SameLine();
         if (item.Tags.Length == 0) UI::Text("No tags");
         else {
             for (uint i = 0; i < item.Tags.Length; i++) {
@@ -117,8 +125,13 @@ class ItemTab : Tab {
             }
         }
 
-        IfaceRender::ImportItemButton(item, true);
-        UI::EndChild();
+        if(item.Description != "") {
+            UI::Separator();
+            UI::Text(Icons::Pencil + " Description");
+            UI::Separator();
+
+            IfaceRender::IXComment(item.Description);
+        }
 
         UI::EndChild();
     }

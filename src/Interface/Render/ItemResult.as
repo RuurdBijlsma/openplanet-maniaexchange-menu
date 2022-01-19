@@ -47,7 +47,7 @@ namespace IfaceRender {
 
         UI::TableSetColumnIndex(6);
         if (UI::GreenButton(Icons::InfoCircle)) {
-            ixMenu.AddTab(ItemTab(item), true);
+            ixMenu.AddTab(ItemTab(item.ID), true);
         }
         UI::SameLine();
         IfaceRender::ImportItemButton(item);

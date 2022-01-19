@@ -86,9 +86,11 @@ class ItemListTab : Tab {
 
         auto jsonItems = json["results"];
         for (uint i = 0; i < jsonItems.Length; i++) {
-            items.InsertLast(IX::Item(jsonItems[i]));
+            IX::Item@ item = IX::Item(jsonItems[i]);
+            downloader.CacheItem(item);
+            items.InsertLast(item);
         }
-        ixMenu.AddTab(ItemTab(items[0]), true); // for dev
+        ixMenu.AddTab(ItemTab(items[0].ID), true); // for dev
     }
 
     void RenderHeader(){}

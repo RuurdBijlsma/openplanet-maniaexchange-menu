@@ -4,6 +4,16 @@ namespace IfaceRender {
         return (HourGlassValue == 0 ? Icons::HourglassStart : (HourGlassValue == 1 ? Icons::HourglassHalf : Icons::HourglassEnd));
     }
 
+    void InfoRow(string key, string value, int spacing){
+        UI::PushFont(ixMenu.g_fontBold);
+        UI::Text(key + ":");
+        UI::PopFont();
+        UI::SameLine();
+        UI::Dummy(vec2(spacing, 0));
+        UI::SameLine();
+        UI::Text(value);
+    }
+
     void ImportItemButton(IX::Item@ item, bool showText = false){
         bool loading = editorIX.isImporting;
 
@@ -11,7 +21,7 @@ namespace IfaceRender {
 
         string extraText = "";
         if(!loading && showText) {
-            extraText += " Import into editor";
+            extraText += " Import";
         }else if(loading && showText) {
             extraText += " Importing...";
         }

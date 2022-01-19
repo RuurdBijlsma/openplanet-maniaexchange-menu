@@ -1,100 +1,50 @@
-class ItemSetTab : Tab
-{
-    Net::HttpRequest@ m_IXrequest;
-    IX::ItemSet@ m_itemSet;
-    int m_setID;
-    bool m_isLoading = false;
-    bool m_itemSetDownloaded = false;
-    bool m_error = false;
+class ItemSetTab : Tab {
+    IX::ItemSet@ itemSet;
+    int ID;
+    EGetStatus status = EGetStatus::Downloading;
 
-    ItemSetTab(int setID) {
-        m_setID = setID;
-        StartIXRequest(setID);
+    ItemSetTab(int setID){
+        this.ID = setID;
+        downloader.Check('set', ID);
     }
 
-    bool CanClose() override { return !m_isLoading; }
-
+    bool CanClose() override { return true; }
     string GetLabel() override {
-        if (m_error) {
-            m_isLoading = false;
+        if (status == EGetStatus::Error) 
             return "\\$f00" + Icons::Times + " \\$zError";
-        }
-        if (m_itemSet is null) {
-            m_isLoading = true;
+        if (status == EGetStatus::Downloading) 
             return Icons::Database + " Loading...";
-        } else {
-            m_isLoading = false;
-            return Icons::Database + " " + m_itemSet.Name;
-        }
+        return Icons::Database + " " + itemSet.Name;
     }
-
-    void StartIXRequest(int ID) {
-        string url = "https://"+MXURL+"/api/set/get_set_info/multi/" + ID;
-        if (IsDevMode()) print("ItemSetTab::StartRequest (IX): " + url);
-        @m_IXrequest = API::Get(url);
-    }
-
-    void CheckIXRequest() {
-        // If there's a request, check if it has finished
-        if (m_IXrequest !is null && m_IXrequest.Finished()) {
-            // Parse the response
-            string res = m_IXrequest.String();
-            if (IsDevMode()) print("ItemSetTab::CheckRequest (IX): " + res);
-            @m_IXrequest = null;
-            auto json = Json::Parse(res);
-
-            if (json.Length == 0) {
-                print("ItemSetTab::CheckRequest (IX): Error parsing response");
-                HandleIXResponseError();
-                return;
-            }
-            // Handle the response
-            HandleIXResponse(json[0]);
-        }
-    }
-
-    void HandleIXResponse(const Json::Value &in json) {
-        @m_itemSet = IX::ItemSet(json);
-    }
-
-    void HandleIXResponseError() {
-        m_error = true;
-    }
-
-    string FormatTime(int time) {
-        int hundreths = time % 1000;
-        time /= 1000;
-        int hours = time / 3600;
-        int minutes = (time / 60) % 60;
-        int seconds = time % 60;
-
-        return (hours != 0 ? Text::Format("%02d", hours) + ":" : "" ) + (minutes != 0 ? Text::Format("%02d", minutes) + ":" : "") + Text::Format("%02d", seconds) + "." + Text::Format("%03d", hundreths);
-    }
+    vec4 GetColor() override { return pluginColorVec; }
 
     void Render() override {
-        CheckIXRequest();
-
-        if (m_error) {
-            UI::Text("\\$f00" + Icons::Times + " \\$zItem set not found");
-            return;
+        if(status != EGetStatus::Available) {
+            status = downloader.Check('set', ID);
+            if(status == EGetStatus::Error) {
+                UI::Text("\\$f00" + Icons::Times + " \\$zSet not found");
+                return;
+            }
+            if(status == EGetStatus::Downloading) {
+                UI::Text(IfaceRender::GetHourGlass() + " Loading...");
+                return;
+            }
+            if(status == EGetStatus::Available) {
+                @itemSet = downloader.GetSet(ID);
+            }
         }
 
-        if (m_itemSet is null) {
-            UI::Text(IfaceRender::GetHourGlass() + " Loading...");
-            return;
-        }
-
-        float width = UI::GetWindowSize().x*0.35;
+        float width = UI::GetWindowSize().x * .4;
         vec2 posTop = UI::GetCursorPos();
 
-        UI::BeginChild("Summary", vec2(width,0));
+        UI::BeginChild("ItemImage", vec2(width, 0));
 
         UI::BeginTabBar("MapImages");
 
-        if (m_itemSet.ImageCount != 0) {
-            for (int i = 1; i < m_itemSet.ImageCount + 1; i++) {
+        if (itemSet.ImageCount != 0) {
+            for (int i = 1; i < itemSet.ImageCount + 1; i++) {
                 if(UI::BeginTabItem(tostring(i))){
-                    auto img = Images::CachedFromURL("https://"+MXURL+"/set/image/"+m_itemSet.ID+'/'+i);
+                    auto img = Images::CachedFromURL("https://"+MXURL+"/set/image/"+itemSet.ID+'/'+i);
 
                     if (img.m_texture !is null){
                         vec2 thumbSize = img.m_texture.GetSize();
@@ -118,77 +68,78 @@ class ItemSetTab : Tab
             }
         }
 
-        if(UI::BeginTabItem("Thumbnail")){
-            auto thumb = Images::CachedFromURL("https://"+MXURL+"/set/image/"+m_itemSet.ID);
-            if (thumb.m_texture !is null){
-                vec2 thumbSize = thumb.m_texture.GetSize();
-                UI::Image(thumb.m_texture, vec2(
-                    width,
-                    thumbSize.y / (thumbSize.x / width)
-                ));
-                if (UI::IsItemHovered()) {
-                    UI::BeginTooltip();
-                    UI::Image(thumb.m_texture, vec2(
-                        Draw::GetWidth() * 0.4,
-                        thumbSize.y / (thumbSize.x / (Draw::GetWidth() * 0.4))
-                    ));
-                    UI::EndTooltip();
-                }
-            } else {
-                UI::Text(IfaceRender::GetHourGlass() + " Loading");
-            }
-            UI::EndTabItem();
-        }
-
         UI::EndTabBar();
-        UI::Separator();
 
-        for (uint i = 0; i < m_itemSet.Tags.Length; i++) {
-            IfaceRender::ItemTag(m_itemSet.Tags[i]);
-            UI::SameLine();
-        }
-        UI::NewLine();
-
-        UI::Text(Icons::Trophy + " \\$f77" + m_itemSet.LikeCount);
-
-        UI::Text(Icons::Hashtag+ " \\$f77" + m_itemSet.ID);
-        UI::SameLine();
-        UI::TextDisabled(Icons::Clipboard);
-        if (UI::IsItemHovered()) {
-            UI::BeginTooltip();
-            UI::Text("Click to copy to clipboard");
-            UI::EndTooltip();
-        }
-        if (UI::IsItemClicked()) {
-            IO::SetClipboard(tostring(m_itemSet.ID));
-            UI::ShowNotification(Icons::Clipboard + " Track ID copied to clipboard");
-        }
-
-        UI::Text(Icons::Calendar + " \\$f77" + m_itemSet.Uploaded);
-        if (m_itemSet.Uploaded != m_itemSet.Updated) UI::Text(Icons::Refresh + " \\$f77" + m_itemSet.Updated);
 
         UI::EndChild();
-
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
-        UI::BeginChild("Description");
+        UI::BeginChild("ItemHeader");
 
-        UI::PushFont(ixMenu.g_fontHeader);
-        UI::Text(m_itemSet.Name);
+        UI::PushFont(ixMenu.g_fontTitle);
+        UI::Text(itemSet.Name);
         UI::PopFont();
 
+        UI::Text(Icons::Bolt + " " + itemSet.Score + " | " + Icons::Download + " " + itemSet.Downloads);
+
+        UI::Separator();
+        UI::Text(Icons::Info + "Information");
         UI::Separator();
 
-        UI::BeginTabBar("ItemSetTabs");
-
-        if(UI::BeginTabItem("Description")){
-            UI::BeginChild("MapDescriptionChild");
-            IfaceRender::IXComment(m_itemSet.Description);
-            UI::EndChild();
-            UI::EndTabItem();
+        IfaceRender::InfoRow("Set ID", tostring(itemSet.ID), 61);
+        IfaceRender::InfoRow("Uploaded by", itemSet.Username, 20);
+        if(itemSet.Updated == itemSet.Uploaded){
+            IfaceRender::InfoRow("Uploaded", itemSet.Uploaded, 40);
+        } else {
+            IfaceRender::InfoRow("Uploaded (Ver.)", itemSet.Uploaded + " (" + itemSet.Updated + ")", 1);
+        }
+        IfaceRender::InfoRow("Filesize", tostring(itemSet.FileSize) + ' KB', 54);
+    
+        UI::PushFont(ixMenu.g_fontBold);
+        UI::Text("Tags:");
+        UI::PopFont();
+        UI::SameLine();
+        UI::Dummy(vec2(74, 0));
+        UI::SameLine();
+        if (itemSet.Tags.Length == 0) UI::Text("No tags");
+        else {
+            for (uint i = 0; i < itemSet.Tags.Length; i++) {
+                if(i != 0) UI::SameLine();
+                IfaceRender::ItemTag(itemSet.Tags[i]);
+            }
         }
 
-        UI::EndTabBar();
+        // UI::Text("Set ID:            " + itemSet.ID);
+        // UI::Text("Uploaded by:       " + itemSet.Username);
+        // if(itemSet.Updated == itemSet.Uploaded){
+        // UI::Text("Uploaded:          " + itemSet.Uploaded);
+        // } else {
+        // UI::Text("Uploaded (Ver.):   " + itemSet.Uploaded + " (" + itemSet.Updated + ")");
+        // }
+        // UI::Text("Filesize:" + tostring(itemSet.FileSize) + ' KB');
+        // UI::Text("Tags:");
+        // UI::SameLine();
+        // if (itemSet.Tags.Length == 0) UI::Text("No tags");
+        // else {
+        //     for (uint i = 0; i < itemSet.Tags.Length; i++) {
+        //         if(i != 0) UI::SameLine();
+        //         IfaceRender::ItemTag(itemSet.Tags[i]);
+        //     }
+        // }
+
+        if(itemSet.Description != "") {
+            UI::Separator();
+            UI::Text(Icons::Pencil + " Description");
+            UI::Separator();
+
+            IfaceRender::IXComment(itemSet.Description);
+        }
+
+        UI::Separator();
+        UI::Text(Icons::Folder + " Contents");
+        UI::Separator();
+
+        UI::Text("Contents here");
 
         UI::EndChild();
     }
-}
+};

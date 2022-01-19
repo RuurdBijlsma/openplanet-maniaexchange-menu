@@ -38,13 +38,13 @@ namespace API
         auto code = request.ResponseCode();
         if(code < 200 || code >= 300) {
             warn("Error making request to '" + url + "' error code: " + code);
-            return Json::Parse(request.String());
+            return Json::Object();
         }
 
         auto contentType = request.ResponseHeader('Content-Type');
         if(!contentType.Contains('application/json')){
             warn("Wrong response type, expected application/json, got '" + contentType + "'");
-            return Json::Parse(request.String());
+            return Json::Object();
         }
 
         auto requestString = request.String();
