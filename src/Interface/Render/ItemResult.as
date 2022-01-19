@@ -1,17 +1,72 @@
 namespace IfaceRender {
+    void ItemSetBlock(IX::ItemSet@ itemSet) {
+        UI::Separator();
+        if(UI::BeginTable("ItemSetBlock", 3)){
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 100);
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 75);
+
+            UI::TableNextRow();
+            UI::TableSetColumnIndex(0);
+            if(itemSet.ImageCount > 0)
+                IfaceRender::HoverImage("https://" + MXURL + "/set/image/" + itemSet.ID + "/1", 100);
+            UI::TableSetColumnIndex(1);
+            UI::PushStyleVar(UI::StyleVar::ItemSpacing, vec2(0, 20));
+            UI::Text(Icons::FolderOpen);
+            UI::SameLine();
+            UI::PushFont(ixMenu.g_fontHeader2);
+            UI::Text(itemSet.Name);
+            UI::PopFont();
+            UI::PopStyleVar();
+            UI::Text("By " + Icons::User + " " + itemSet.Username + " | " + Icons::Heart + " " + itemSet.LikeCount + " | " + Icons::Bolt + " " + itemSet.Score + " | " + Icons::Download + " " + itemSet.Downloads);
+            UI::TableSetColumnIndex(2);
+            
+            if (UI::GreenButton(Icons::InfoCircle)) {
+                ixMenu.AddTab(ItemSetTab(itemSet.ID), true);
+            }
+
+            UI::EndTable();
+        }
+        UI::Separator();
+    }
+
+    void ItemBlock(IX::Item@ item) {
+        UI::Separator();
+        if(UI::BeginTable("ItemBlock", 3)){
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 50);
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 75);
+
+            UI::TableNextRow();
+            UI::TableSetColumnIndex(0);
+            IfaceRender::Image("https://" + MXURL + "/item/icon/" + item.ID, 50);
+            UI::TableSetColumnIndex(1);
+            UI::PushStyleVar(UI::StyleVar::ItemSpacing, vec2(0, 15));
+            IfaceRender::ItemType(item);
+            UI::SameLine();
+            UI::PushFont(ixMenu.g_fontHeader2);
+            UI::Text(item.Name);
+            UI::PopFont();
+            UI::PopStyleVar();
+            UI::Text("By " + Icons::User + " " + item.Username + " | " + Icons::Heart + " " + item.LikeCount + " | " + Icons::Bolt + " " + item.Score + " | " + Icons::Download + " " + item.Downloads);
+            UI::TableSetColumnIndex(2);
+            
+            if (UI::GreenButton(Icons::InfoCircle)) {
+                ixMenu.AddTab(ItemTab(item.ID), true);
+            }
+            UI::SameLine();
+            IfaceRender::ImportItemButton(item);
+
+            UI::EndTable();
+        }
+        UI::Separator();
+    }
+
     void ItemRow(IX::Item@ item){
         UI::TableNextRow();
         UI::TableSetColumnIndex(0);
 
-        auto img = Images::CachedFromURL("https://" + MXURL + "/item/icon/" + item.ID);
-        auto thumbWidth = 50;
-        if(img.m_texture !is null){
-            vec2 thumbSize = img.m_texture.GetSize();
-            UI::Image(img.m_texture, vec2(
-                thumbWidth,
-                thumbSize.y / (thumbSize.x / thumbWidth)
-            ));
-        }
+        IfaceRender::Image("https://" + MXURL + "/item/icon/" + item.ID, 50);
 
         UI::TableSetColumnIndex(1);
         
@@ -25,13 +80,7 @@ namespace IfaceRender {
         UI::Text(item.Name);
 
         // Item Tags on newline
-        if (item.Tags.Length == 0) UI::Text("No tags");
-        else {
-            for (uint i = 0; i < item.Tags.Length; i++) {
-                if(i != 0) UI::SameLine();
-                IfaceRender::ItemTag(item.Tags[i]);
-            }
-        }
+        IfaceRender::Tags(item.Tags);
 
         UI::TableSetColumnIndex(2);
         UI::Text(item.Username);

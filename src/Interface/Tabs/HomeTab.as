@@ -9,14 +9,7 @@ class HomePageTab : Tab {
 
         UI::BeginChild("Summary", vec2(width,0));
 
-        auto logo = Images::CachedFromURL("https://images.mania.exchange/logos/ix/square_sm.png");
-        if (logo.m_texture !is null){
-            vec2 logoSize = logo.m_texture.GetSize();
-            UI::Image(logo.m_texture, vec2(
-                width,
-                logoSize.y / (logoSize.x / width)
-            ));
-        }
+        IfaceRender::Image("https://images.mania.exchange/logos/ix/square_sm.png", width);
 
         UI::EndChild();
         UI::SetCursorPos(posTop + vec2(width + 8, 0));

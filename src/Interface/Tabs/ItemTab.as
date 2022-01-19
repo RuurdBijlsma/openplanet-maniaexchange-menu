@@ -40,26 +40,12 @@ class ItemTab : Tab {
 
         
         UI::BeginTabBar("ItemImages");
-        if(UI::BeginTabItem("Icon")){
-            auto img = Images::CachedFromURL("https://" + MXURL + "/item/icon/" + item.ID);
-            if(img.m_texture !is null){
-                vec2 thumbSize = img.m_texture.GetSize();
-                UI::Image(img.m_texture, vec2(
-                    width,
-                    thumbSize.y / (thumbSize.x / width)
-                ));
-            }
+        if(UI::BeginTabItem("Icon")) {
+            IfaceRender::Image("https://" + MXURL + "/item/icon/" + item.ID, width);
             UI::EndTabItem();
         }
-        if(item.HasThumbnail && UI::BeginTabItem("Thumbnail")){
-            auto img = Images::CachedFromURL("https://" + MXURL + "/item/thumbnail/" + item.ID);
-            if(img.m_texture !is null){
-                vec2 thumbSize = img.m_texture.GetSize();
-                UI::Image(img.m_texture, vec2(
-                    width,
-                    thumbSize.y / (thumbSize.x / width)
-                ));
-            }
+        if(item.HasThumbnail && UI::BeginTabItem("Thumbnail")) {
+            IfaceRender::HoverImage("https://" + MXURL + "/item/thumbnail/" + item.ID, width);
             UI::EndTabItem();
         }
         UI::EndTabBar();
@@ -92,35 +78,36 @@ class ItemTab : Tab {
             UI::PopStyleColor(4);
         }
 
-        UI::Separator();
-        UI::Text(Icons::Info + " Information");
-        UI::Separator();
+        IfaceRender::TabHeader(Icons::InfoCircle + " Information");
 
-        IfaceRender::InfoRow("Item ID", tostring(item.ID), 51);
-        IfaceRender::InfoRow("Uploaded by", item.Username, 20);
-        if(item.AuthorLogin != '') {
-            IfaceRender::InfoRow("Creator Login", item.AuthorLogin, 13);
-        }
-        if(item.Updated == item.Uploaded){
-            IfaceRender::InfoRow("Uploaded", item.Uploaded, 40);
-        } else {
-            IfaceRender::InfoRow("Uploaded (Ver.)", item.Uploaded + " (" + item.Updated + ")", 1);
-        }
-        IfaceRender::InfoRow("Item Type", tostring(item.Type), 36);
-        IfaceRender::InfoRow("Filesize", tostring(item.FileSize) + ' KB', 54);
-    
-        UI::PushFont(ixMenu.g_fontBold);
-        UI::Text("Tags:");
-        UI::PopFont();
-        UI::SameLine();
-        UI::Dummy(vec2(74, 0));
-        UI::SameLine();
-        if (item.Tags.Length == 0) UI::Text("No tags");
-        else {
-            for (uint i = 0; i < item.Tags.Length; i++) {
-                if(i != 0) UI::SameLine();
-                IfaceRender::ItemTag(item.Tags[i]);
+        if(UI::BeginTable("InfoColumns", 2)) {
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 125);
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
+
+            IfaceRender::SimpleTableRow({"Item ID:", tostring(item.ID)});
+            IfaceRender::SimpleTableRow({"Uploaded by:", item.Username});
+            if(item.AuthorLogin != '') {
+                IfaceRender::SimpleTableRow({"Creator Login:", item.AuthorLogin});
             }
+            if(item.Updated == item.Uploaded){
+                IfaceRender::SimpleTableRow({"Uploaded:", item.Uploaded});
+            } else {
+                IfaceRender::SimpleTableRow({"Uploaded (Ver.):", item.Uploaded + " (" + item.Updated + ")"});
+            }
+            IfaceRender::SimpleTableRow({"Item Type:", tostring(item.Type)});
+            IfaceRender::SimpleTableRow({"Filesize:", tostring(item.FileSize) + ' KB'});
+            
+            // tag row
+            UI::TableNextRow();
+            UI::PushFont(ixMenu.g_fontBold);
+            UI::TableSetColumnIndex(0);
+            UI::Text("Tags:");
+            UI::PopFont();
+            UI::TableSetColumnIndex(1);
+            IfaceRender::Tags(item.Tags);
+            // end tag row
+
+            UI::EndTable();
         }
 
         if(ixMenu.isInEditor) {
@@ -129,10 +116,7 @@ class ItemTab : Tab {
         }
 
         if(item.Description != "") {
-            UI::Separator();
-            UI::Text(Icons::Pencil + " Description");
-            UI::Separator();
-
+            IfaceRender::TabHeader(Icons::Pencil + " Description");
             IfaceRender::IXComment(item.Description);
         }
 

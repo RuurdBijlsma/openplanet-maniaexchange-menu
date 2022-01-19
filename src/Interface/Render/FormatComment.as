@@ -52,6 +52,9 @@ namespace IfaceRender {
         // align replacement
         formatted = Regex::Replace(formatted, "\\[align=([^\\]]*)\\]([^\\[]*)\\[\\/align\\]", "$2");
 
+        // No support for horizontal lines
+        formatted = Regex::Replace(formatted, "-----", " ");
+
         // Find set and item ids in text formatted like so: [item-12345] [set-123]
         auto itemParts = (formatted + ' ').Split('[item-');
         TextPart@[] itemTextParts = {TextPart(itemParts[0], EPartType::Text)};
@@ -105,15 +108,37 @@ namespace IfaceRender {
         for(uint i = 0; i < textParts.Length; i++) {
             auto part = textParts[i];
             if(part.type == EPartType::Item) {
-                if(UI::CyanButton('item ' + part.value)){
-                    print("nice item");
+                auto itemID = Text::ParseInt(part.value);
+                auto getStatus = downloader.Check('item', + itemID);
+                if(getStatus == EGetStatus::Downloading) {
+                    if(UI::GreenButton(IfaceRender::GetHourGlass() + " Item " + part.value)) {
+                        ixMenu.AddTab(ItemTab(itemID), true);
+                    }
+                } else if (getStatus == EGetStatus::Error) {
+                    if(UI::GreenButton(Icons::ExclamationTriangle + " Item " + part.value)) {
+                        ixMenu.AddTab(ItemTab(itemID), true);
+                    }
+                } else if (getStatus == EGetStatus::Available) {
+                    IfaceRender::ItemBlock(downloader.GetItem(itemID));
                 }
             } else if(part.type == EPartType::Set) {
-                if(UI::GreenButton('set ' + part.value)){
-                    print("nice set");
+                auto itemSetID = Text::ParseInt(part.value);
+                auto getStatus = downloader.Check('set', + itemSetID);
+                if(getStatus == EGetStatus::Downloading) {
+                    if(UI::OrangeButton(IfaceRender::GetHourGlass() + " Set " + part.value)) {
+                        ixMenu.AddTab(ItemSetTab(itemSetID), true);
+                    }
+                } else if (getStatus == EGetStatus::Error) {
+                    if(UI::OrangeButton(Icons::ExclamationTriangle + " Set " + part.value)) {
+                        ixMenu.AddTab(ItemSetTab(itemSetID), true);
+                    }
+                } else if (getStatus == EGetStatus::Available) {
+                    IfaceRender::ItemSetBlock(downloader.GetSet(itemSetID));
                 }
-            } else if(part.value.Trim().Length > 0) {
-                UI::Markdown(part.value);
+            } else{
+                auto trimmedText = part.value.Trim();
+                if(trimmedText.Length > 0) 
+                    UI::Markdown(trimmedText);
             }
         }
     }

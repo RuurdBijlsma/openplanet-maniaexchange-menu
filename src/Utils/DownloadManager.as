@@ -82,9 +82,9 @@ void AsyncRefreshCache(ref@ idAndKey){
         return;
     }
     if(key == 'item') {
-        downloader.cache.Set(key + id, @IX::Item(json[0]));
+        downloader.CacheItem(IX::Item(json[0]));
     } else {
-        downloader.cache.Set(key + id, @IX::ItemSet(json[0]));
+        downloader.CacheSet(IX::ItemSet(json[0]));
     }
     downloader.downloads.RemoveAt(downloader.downloads.Find(key + id));
 }

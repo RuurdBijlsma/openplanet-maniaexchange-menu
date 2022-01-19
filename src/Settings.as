@@ -14,9 +14,6 @@ bool Setting_Tab_MostAwarded_Visible = true;
 [Setting name="Featured" category="Display Tabs"]
 bool Setting_Tab_Featured_Visible = true;
 
-[Setting name="Tags" category="Display Tabs"]
-bool Setting_Tab_Tags_Visible = true;
-
 [Setting name="Latest" category="Display Tabs"]
 bool Setting_Tab_Latest_Visible = true;
 

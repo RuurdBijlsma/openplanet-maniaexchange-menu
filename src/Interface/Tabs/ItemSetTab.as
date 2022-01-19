@@ -43,26 +43,8 @@ class ItemSetTab : Tab {
 
         if (itemSet.ImageCount != 0) {
             for (int i = 1; i < itemSet.ImageCount + 1; i++) {
-                if(UI::BeginTabItem(tostring(i))){
-                    auto img = Images::CachedFromURL("https://"+MXURL+"/set/image/"+itemSet.ID+'/'+i);
-
-                    if (img.m_texture !is null){
-                        vec2 thumbSize = img.m_texture.GetSize();
-                        UI::Image(img.m_texture, vec2(
-                            width,
-                            thumbSize.y / (thumbSize.x / width)
-                        ));
-                        if (UI::IsItemHovered()) {
-                            UI::BeginTooltip();
-                            UI::Image(img.m_texture, vec2(
-                                Draw::GetWidth() * 0.6,
-                                thumbSize.y / (thumbSize.x / (Draw::GetWidth() * 0.6))
-                            ));
-                            UI::EndTooltip();
-                        }
-                    } else {
-                        UI::Text(IfaceRender::GetHourGlass() + " Loading");
-                    }
+                if(UI::BeginTabItem(tostring(i))) {
+                    IfaceRender::HoverImage("https://" + MXURL + "/set/image/" + itemSet.ID + '/' + i, width);
                     UI::EndTabItem();
                 }
             }
@@ -80,65 +62,44 @@ class ItemSetTab : Tab {
         UI::PopFont();
 
         UI::Text(Icons::Bolt + " " + itemSet.Score + " | " + Icons::Download + " " + itemSet.Downloads);
+        
+        IfaceRender::TabHeader(Icons::InfoCircle + " Information");
 
-        UI::Separator();
-        UI::Text(Icons::Info + "Information");
-        UI::Separator();
+        if(UI::BeginTable("InfoColumns", 2)) {
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 125);
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
 
-        IfaceRender::InfoRow("Set ID", tostring(itemSet.ID), 61);
-        IfaceRender::InfoRow("Uploaded by", itemSet.Username, 20);
-        if(itemSet.Updated == itemSet.Uploaded){
-            IfaceRender::InfoRow("Uploaded", itemSet.Uploaded, 40);
-        } else {
-            IfaceRender::InfoRow("Uploaded (Ver.)", itemSet.Uploaded + " (" + itemSet.Updated + ")", 1);
-        }
-        IfaceRender::InfoRow("Filesize", tostring(itemSet.FileSize) + ' KB', 54);
-    
-        UI::PushFont(ixMenu.g_fontBold);
-        UI::Text("Tags:");
-        UI::PopFont();
-        UI::SameLine();
-        UI::Dummy(vec2(74, 0));
-        UI::SameLine();
-        if (itemSet.Tags.Length == 0) UI::Text("No tags");
-        else {
-            for (uint i = 0; i < itemSet.Tags.Length; i++) {
-                if(i != 0) UI::SameLine();
-                IfaceRender::ItemTag(itemSet.Tags[i]);
+            IfaceRender::SimpleTableRow({"Set ID:", tostring(itemSet.ID)});
+            IfaceRender::SimpleTableRow({"Uploaded by:", itemSet.Username});
+            if(itemSet.Updated == itemSet.Uploaded){
+                IfaceRender::SimpleTableRow({"Uploaded:", itemSet.Uploaded});
+            } else {
+                IfaceRender::SimpleTableRow({"Uploaded (Ver.):", itemSet.Uploaded + " (" + itemSet.Updated + ")"});
             }
+            IfaceRender::SimpleTableRow({"Filesize:", tostring(itemSet.FileSize) + ' KB'});
+            
+            // tag row
+            UI::TableNextRow();
+            UI::PushFont(ixMenu.g_fontBold);
+            UI::TableSetColumnIndex(0);
+            UI::Text("Tags:");
+            UI::PopFont();
+            UI::TableSetColumnIndex(1);
+            IfaceRender::Tags(itemSet.Tags);
+            // end tag row
+
+            UI::EndTable();
         }
-
-        // UI::Text("Set ID:            " + itemSet.ID);
-        // UI::Text("Uploaded by:       " + itemSet.Username);
-        // if(itemSet.Updated == itemSet.Uploaded){
-        // UI::Text("Uploaded:          " + itemSet.Uploaded);
-        // } else {
-        // UI::Text("Uploaded (Ver.):   " + itemSet.Uploaded + " (" + itemSet.Updated + ")");
-        // }
-        // UI::Text("Filesize:" + tostring(itemSet.FileSize) + ' KB');
-        // UI::Text("Tags:");
-        // UI::SameLine();
-        // if (itemSet.Tags.Length == 0) UI::Text("No tags");
-        // else {
-        //     for (uint i = 0; i < itemSet.Tags.Length; i++) {
-        //         if(i != 0) UI::SameLine();
-        //         IfaceRender::ItemTag(itemSet.Tags[i]);
-        //     }
-        // }
-
+        
+        
         if(itemSet.Description != "") {
-            UI::Separator();
-            UI::Text(Icons::Pencil + " Description");
-            UI::Separator();
-
+            IfaceRender::TabHeader(Icons::Pencil + " Description");
             IfaceRender::IXComment(itemSet.Description);
         }
 
-        UI::Separator();
-        UI::Text(Icons::Folder + " Contents");
-        UI::Separator();
-
+        IfaceRender::TabHeader(Icons::FolderOpen + " Contents");
         UI::Text("Contents here");
+
 
         UI::EndChild();
     }

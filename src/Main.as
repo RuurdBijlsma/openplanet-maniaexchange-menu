@@ -5,12 +5,17 @@
 // make import item set button
 // maybe more stuff in download manager
 // MORE STUFF
+// replace all images with IfaceRender::image
+
 
 EditorIX@ editorIX = null;
 
 void Main() {
     @editorIX = EditorIX();
     startnew(IX::GetAllItemTags);
+    // for dev
+    sleep(100);
+    ixMenu.AddTab(ItemSetTab(11270));
 }
 
 void RenderMenu() {
@@ -24,6 +29,7 @@ void RenderMenu() {
 }
 
 void RenderMenuMain(){
+    return;
     if(UI::BeginMenu(nameMenu + (IX::APIDown ? " \\$f00"+Icons::Server : ""))) {
         if (!IX::APIDown) {
             if(UI::MenuItem(pluginColor + Icons::WindowMaximize+"\\$z Open "+shortMXName+" menu", "", ixMenu.isOpened)) {
