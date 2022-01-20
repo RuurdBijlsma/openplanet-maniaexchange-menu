@@ -153,10 +153,10 @@ namespace IX {
                 @items = cast<IX::Item@[]@>(node[TreeItemsKey]);
             }
             items.InsertLast(item);
-
-            PrintTree(tree);
         }
+
         // debug stuff
+        PrintTree(tree);
         // dictionary@ ims = cast<dictionary@>(tree['Items']);
         // if(ims is null) warn("ims is null");
         // print("Keys in ims: " + string::Join(ims.GetKeys(), ','));
