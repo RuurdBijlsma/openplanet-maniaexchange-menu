@@ -1,29 +1,26 @@
-namespace IX
-{
-    void PrintTree3Levels(dictionary@ tree){
-        auto keys1 = tree.GetKeys();
-        for(uint i = 0; i < keys1.Length; i++) {
-            print(tostring(i) + ": " + keys1[i]);
+namespace IX {
+    void PrintTree(dictionary@ tree, string indent = ""){
+        auto keys = tree.GetKeys();
+        for(uint i = 0; i < keys.Length; i++) {
 
-            dictionary@ innerTree;
-            if(!tree.Get(keys1[i], @innerTree)) {
-                warn("Couldn't find key " + keys1[i] + "in tree");
-                continue;
-            }
-            auto keys2 = innerTree.GetKeys();
-            for(uint j = 0; j < keys2.Length; j++) {
-                print("  - " + tostring(j) + ": " + keys2[j]);
-
-                dictionary@ innerInnerTree;
-                if(!innerTree.Get(keys2[j], @innerInnerTree)) {
-                    warn("Couldn't Get<dict>() key " + keys2[j] + "in innerTree");
+            if(keys[i] == TreeItemsKey) {
+                IX::Item@[]@ items;
+                if(!tree.Get(keys[i], @items)){
+                    warn("Can't get array " + keys[i]);
                     continue;
                 }
-                auto keys3 = innerInnerTree.GetKeys();
-                for(uint k = 0; k < keys3.Length; k++) {
-                    print("      - " + tostring(k) + ": " + keys3[k]);
-                }
+                print(indent + tostring(i) + ": " +  "array[" + items.Length + "]");
+                continue;
             }
+
+            print(indent + tostring(i) + ": " + keys[i]);
+            dictionary@ innerTree;
+            if(!tree.Get(keys[i], @innerTree)){
+                warn("Can't find key " + keys[i]);
+                continue;
+            }
+            
+            PrintTree(innerTree, indent + "    ");
         }
     }
 
@@ -137,50 +134,43 @@ namespace IX
             // print("0 Setting current node to root");
             // create children if needed
             for(uint j = 0; j < parts.Length; j++) {
-                dictionary @ childNode;
+                dictionary@ childNode;
                 if(node.Get(parts[j], @childNode)) {
-                    // print("Not creating child node: " + parts[j]);
                     @node = childNode;
-                    // print("1 Setting current node to " + parts[j]);
                 } else {
                     print(parts[j] + " does not exist on this node");
                     // if child node doesn't exist yet, create
-                    @childNode = {};
-                    node[parts[j]] = childNode;
-                    cont = true;
-                    break;
-                    // @node = childNode;
-                    // print("Creating child node: " + parts[j]);
-                    // print("2 Setting current node to " + parts[j]);
+                    dictionary@ tempNode = {};
+                    node[parts[j]] = tempNode;
+                    @node = cast<dictionary@>(node[parts[j]]);
                 }
             }
-            if(cont) {
-                i--;
-                continue;
-            };
-            PrintTree3Levels(tree);
             // node is now equal to item directory
             IX::Item@[]@ items;
             if(!node.Get(TreeItemsKey, @items)) {
                 @items = {};
                 node[TreeItemsKey] = items;
+                @items = cast<IX::Item@[]@>(node[TreeItemsKey]);
             }
             items.InsertLast(item);
+
+            PrintTree(tree);
         }
-        dictionary@ ims = cast<dictionary@>(tree['Items']);
-        if(ims is null) warn("ims is null");
-        print("Keys in ims: " + string::Join(ims.GetKeys(), ','));
-        dictionary@ Grass = cast<dictionary@>(ims['Grass']);
-        if(Grass is null) warn("Grass is null");
-        print("Keys in Grass: " + string::Join(Grass.GetKeys(), ','));
-        dictionary@ StartEnd = cast<dictionary@>(Grass['Start-End']);
-        if(StartEnd is null) warn("StartEnd is null");
-        print("Keys in startend: " + string::Join(StartEnd.GetKeys(), ','));
-        dictionary@ Dirt = cast<dictionary@>(StartEnd['Dirt']);
-        if(Dirt is null) warn("Dirt is null");
-        IX::Item@[]@ itemsArray = cast<IX::Item@[]@>(Dirt[TreeItemsKey]);
-        if(itemsArray is null) warn("itemsArray is null");
-        print("Items in items>grass>start-end>dirt length: " + itemsArray.Length);
+        // debug stuff
+        // dictionary@ ims = cast<dictionary@>(tree['Items']);
+        // if(ims is null) warn("ims is null");
+        // print("Keys in ims: " + string::Join(ims.GetKeys(), ','));
+        // dictionary@ Grass = cast<dictionary@>(ims['Grass']);
+        // if(Grass is null) warn("Grass is null");
+        // print("Keys in Grass: " + string::Join(Grass.GetKeys(), ','));
+        // dictionary@ StartEnd = cast<dictionary@>(Grass['Start-End']);
+        // if(StartEnd is null) warn("StartEnd is null");
+        // print("Keys in startend: " + string::Join(StartEnd.GetKeys(), ','));
+        // dictionary@ Dirt = cast<dictionary@>(StartEnd['Dirt']);
+        // if(Dirt is null) warn("Dirt is null");
+        // IX::Item@[]@ itemsArray = cast<IX::Item@[]@>(Dirt[TreeItemsKey]);
+        // if(itemsArray is null) warn("itemsArray is null");
+        // print("Items in items>grass>start-end>dirt length: " + itemsArray.Length);
         return tree;
     }
 
@@ -210,7 +200,7 @@ namespace IX
         dictionary@ contentTree = null;
 
         ItemSet(const Json::Value &in json) {
-            // try {
+            try {
                 ID = json["ID"];
                 Name = json["Name"];
                 UserID = json["UserID"];
@@ -241,10 +231,10 @@ namespace IX
                         Items.InsertLast(Item(jItems[i]));
                 }
                 @contentTree = CreateContentTree(Items);
-            // } catch {
-            //     Name = json["Name"];
-            //     mxError("Error parsing ItemSet: "+Name);
-            // }
+            } catch {
+                Name = json["Name"];
+                mxError("Error parsing ItemSet: "+Name);
+            }
         }
     };
 
