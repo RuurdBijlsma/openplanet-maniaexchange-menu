@@ -33,6 +33,10 @@ class ItemSetTab : Tab {
                 @itemSet = downloader.GetSet(ID);
             }
         }
+        if(itemSet.Items.Length == 0 && downloader.Check('set', ID) == EGetStatus::Available) {
+            print("Making full itemset request");
+            downloader.RefreshCache('set', ID);
+        }
 
         float width = UI::GetWindowSize().x * .4;
         vec2 posTop = UI::GetCursorPos();
@@ -51,7 +55,6 @@ class ItemSetTab : Tab {
         }
 
         UI::EndTabBar();
-
 
         UI::EndChild();
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
@@ -97,10 +100,24 @@ class ItemSetTab : Tab {
             IfaceRender::IXComment(itemSet.Description);
         }
 
-        IfaceRender::TabHeader(Icons::FolderOpen + " Contents");
-        UI::Text("Contents here");
+        if(itemSet.Items.Length > 0) {
+            IfaceRender::TabHeader(Icons::FolderOpen + " Contents");
+            UI::Text("Contents here");
+        }
 
 
         UI::EndChild();
+    }
+
+    bool SequenceEquals(string[]@ s1, string[]@ s2) {
+        if(s1.Length != s2.Length) {
+            return false;
+        }
+        for(uint i = 0; i < s1.Length; i++) {
+            if(s1[i] != s2[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 };

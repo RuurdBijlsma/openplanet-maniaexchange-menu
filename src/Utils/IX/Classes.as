@@ -1,5 +1,32 @@
 namespace IX
 {
+    void PrintTree3Levels(dictionary@ tree){
+        auto keys1 = tree.GetKeys();
+        for(uint i = 0; i < keys1.Length; i++) {
+            print(tostring(i) + ": " + keys1[i]);
+
+            dictionary@ innerTree;
+            if(!tree.Get(keys1[i], @innerTree)) {
+                warn("Couldn't find key " + keys1[i] + "in tree");
+                continue;
+            }
+            auto keys2 = innerTree.GetKeys();
+            for(uint j = 0; j < keys2.Length; j++) {
+                print("  - " + tostring(j) + ": " + keys2[j]);
+
+                dictionary@ innerInnerTree;
+                if(!innerTree.Get(keys2[j], @innerInnerTree)) {
+                    warn("Couldn't Get<dict>() key " + keys2[j] + "in innerTree");
+                    continue;
+                }
+                auto keys3 = innerInnerTree.GetKeys();
+                for(uint k = 0; k < keys3.Length; k++) {
+                    print("      - " + tostring(k) + ": " + keys3[k]);
+                }
+            }
+        }
+    }
+
     array<ItemTag@> ParseItemTags(Json::Value json){
         array<ItemTag@> tags = {};
         if (json.GetType() != Json::Type::Null) {
@@ -95,6 +122,68 @@ namespace IX
         }
     };
 
+    //todo createcontentree is only creating 1 level of dir at a time
+
+    // unique key that can't occur naturally in itemset content folder structure
+    const string TreeItemsKey = "items_-*-_-*-_.-*-._>_<:()";
+    dictionary@ CreateContentTree(IX::Item@[] items) {
+        dictionary@ tree = {};
+        for(uint i = 0; i < items.Length; i++) {
+            auto item = items[i];
+            print("Item dir: " + item.Directory);
+            auto parts = item.Directory.Split("\\");
+            dictionary@ node = tree;
+            bool cont = false;
+            // print("0 Setting current node to root");
+            // create children if needed
+            for(uint j = 0; j < parts.Length; j++) {
+                dictionary @ childNode;
+                if(node.Get(parts[j], @childNode)) {
+                    // print("Not creating child node: " + parts[j]);
+                    @node = childNode;
+                    // print("1 Setting current node to " + parts[j]);
+                } else {
+                    print(parts[j] + " does not exist on this node");
+                    // if child node doesn't exist yet, create
+                    @childNode = {};
+                    node[parts[j]] = childNode;
+                    cont = true;
+                    break;
+                    // @node = childNode;
+                    // print("Creating child node: " + parts[j]);
+                    // print("2 Setting current node to " + parts[j]);
+                }
+            }
+            if(cont) {
+                i--;
+                continue;
+            };
+            PrintTree3Levels(tree);
+            // node is now equal to item directory
+            IX::Item@[]@ items;
+            if(!node.Get(TreeItemsKey, @items)) {
+                @items = {};
+                node[TreeItemsKey] = items;
+            }
+            items.InsertLast(item);
+        }
+        dictionary@ ims = cast<dictionary@>(tree['Items']);
+        if(ims is null) warn("ims is null");
+        print("Keys in ims: " + string::Join(ims.GetKeys(), ','));
+        dictionary@ Grass = cast<dictionary@>(ims['Grass']);
+        if(Grass is null) warn("Grass is null");
+        print("Keys in Grass: " + string::Join(Grass.GetKeys(), ','));
+        dictionary@ StartEnd = cast<dictionary@>(Grass['Start-End']);
+        if(StartEnd is null) warn("StartEnd is null");
+        print("Keys in startend: " + string::Join(StartEnd.GetKeys(), ','));
+        dictionary@ Dirt = cast<dictionary@>(StartEnd['Dirt']);
+        if(Dirt is null) warn("Dirt is null");
+        IX::Item@[]@ itemsArray = cast<IX::Item@[]@>(Dirt[TreeItemsKey]);
+        if(itemsArray is null) warn("itemsArray is null");
+        print("Items in items>grass>start-end>dirt length: " + itemsArray.Length);
+        return tree;
+    }
+
     class ItemSet {
         int64 ID; //ItemExchange Set identifier
         string Name; //Name of the Set
@@ -118,9 +207,10 @@ namespace IX
         int32 CommentCount; //Amount of Comments received on the Set
         array<ItemTag@> Tags = {}; //	CS list of tags (see Get_Tags method)
         int32 ImageCount; //Amount of images that are uploaded for the Set
+        dictionary@ contentTree = null;
 
         ItemSet(const Json::Value &in json) {
-            try {
+            // try {
                 ID = json["ID"];
                 Name = json["Name"];
                 UserID = json["UserID"];
@@ -150,10 +240,11 @@ namespace IX
                     for(uint i=0; i<jItems.Length; i++)
                         Items.InsertLast(Item(jItems[i]));
                 }
-            } catch {
-                Name = json["Name"];
-                mxError("Error parsing ItemSet: "+Name);
-            }
+                @contentTree = CreateContentTree(Items);
+            // } catch {
+            //     Name = json["Name"];
+            //     mxError("Error parsing ItemSet: "+Name);
+            // }
         }
     };
 

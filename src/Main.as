@@ -15,7 +15,7 @@ void Main() {
     startnew(IX::GetAllItemTags);
     // for dev
     sleep(100);
-    ixMenu.AddTab(ItemSetTab(11270));
+    ixMenu.AddTab(ItemSetTab(11261));
 }
 
 void RenderMenu() {
