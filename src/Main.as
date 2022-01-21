@@ -8,6 +8,8 @@
 // replace all images with IfaceRender::image
 // add import item array button
 // add import by zip?
+// if there is a cached gbx item file, show button to delete the cache for it
+// add import method without dll if dll is not found
 
 
 EditorIX@ editorIX = null;

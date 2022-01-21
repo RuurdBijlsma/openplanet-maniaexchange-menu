@@ -55,13 +55,20 @@ class EditorIX {
 
     void CreateFolderRecursive(string basePath, string createPath){
         string separator = "/";
-        if(createPath.Contains("\\"))
-            separator = "\\";
+        basePath.Replace("\\", separator);
+        createPath.Replace("\\", separator);
+        // remove double //
+        while(basePath.Contains(separator + separator)){
+            basePath = basePath.Replace(separator + separator, separator);
+        }
+        while(createPath.Contains(separator + separator)){
+            createPath = createPath.Replace(separator + separator, separator);
+        }
         // Format path to the following template
         // basePath: C://Users/Ruurd/ (ends with separator)
         // createPath: OpenplanetNext/Plugins/lib (no separator at start or end)
-        if(!basePath.EndsWith(separator)){
-            basePath = basePath + separator;
+        if(basePath.EndsWith(separator)){
+            basePath = basePath.SubStr(0, basePath.Length - 1);
         }
         if(createPath.StartsWith(separator)) {
             createPath = createPath.SubStr(1);
@@ -73,10 +80,10 @@ class EditorIX {
 
         string path = basePath;
         for(uint i = 0; i < parts.Length; i++) {
-            if(!IO::FolderExists(path + parts[i])) {
-                IO::CreateFolder(path + parts[i]);
+            if(!IO::FolderExists(path + separator + parts[i])) {
+                IO::CreateFolder(path + separator + parts[i]);
             }
-            path += parts[i];
+            path += separator + parts[i];
         }
     }
 
@@ -150,10 +157,7 @@ class EditorIX {
         if(!WaitForImport()) return false;
         isImporting = true;
 
-        string itemFolder = item.Username + '/';
-        if(item.SetID != 0) {
-            itemFolder += item.SetName + '/';
-        }
+        string itemFolder = GetItemFolder(item);
         CreateFolderRecursive(downloadFolder, itemFolder);
         
         string filePath = downloadFolder + itemFolder + item.FileName;
