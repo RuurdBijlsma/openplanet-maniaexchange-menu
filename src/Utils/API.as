@@ -1,5 +1,4 @@
-namespace API
-{
+namespace API {
     Net::HttpRequest@ Get(const string &in url) {
         print("Starting URL request: '" + url + "'");
         
@@ -13,7 +12,7 @@ namespace API
     }
     
     bool DownloadToFile(string url, string destinationPath) {
-        auto request = Get(url);
+        auto request = Net::HttpGet(url);
         while(!request.Finished())
             yield();
         auto code = request.ResponseCode();

@@ -1,9 +1,20 @@
+class RequestItemTuple {
+    Net::HttpRequest@ request = null;
+    IX::Item@ item = null;
+    RequestItemTuple(Net::HttpRequest@ request, IX::Item@ item) {
+        @this.request = request;
+        @this.item = item;
+    }
+};
+
 class EditorIX {
     Import::Library@ lib = null;
     Import::Function@ clickFun = null;
     Import::Function@ mousePosFun = null;
     bool isImporting = false;
     string downloadFolder = '';
+    int importTotal = 1;
+    int importFinished = 0;
 
     EditorIX (){
         print("Getting click dll");
@@ -27,7 +38,7 @@ class EditorIX {
         print("IX");
     }
 
-    bool ImportItem(IX::Item@ item, string desiredItemLocation = '') {
+    bool WaitForImport() {
         int waitTime = 0;
         while(isImporting) { 
             waitTime++;
@@ -39,15 +50,112 @@ class EditorIX {
                 return false;
             }
         }
+        return true;
+    }
+
+    void CreateFolderRecursive(string basePath, string createPath){
+        string separator = "/";
+        if(createPath.Contains("\\"))
+            separator = "\\";
+        // Format path to the following template
+        // basePath: C://Users/Ruurd/ (ends with separator)
+        // createPath: OpenplanetNext/Plugins/lib (no separator at start or end)
+        if(!basePath.EndsWith(separator)){
+            basePath = basePath + separator;
+        }
+        if(createPath.StartsWith(separator)) {
+            createPath = createPath.SubStr(1);
+        }
+        if(createPath.EndsWith(separator)) {
+            createPath = createPath.SubStr(0, createPath.Length - 1);
+        }
+        auto parts = createPath.Split(separator);
+
+        string path = basePath;
+        for(uint i = 0; i < parts.Length; i++) {
+            if(!IO::FolderExists(path + parts[i])) {
+                IO::CreateFolder(path + parts[i]);
+            }
+            path += parts[i];
+        }
+    }
+
+    string GetItemFolder(IX::Item@ item) {
+        string itemFolder = item.Username + '/';
+        if(item.SetID != 0) {
+            itemFolder += item.SetName + '/';
+        }
+        return itemFolder;
+    }
+
+    bool ImportItems(IX::Item@[] items) {
+        importFinished = 0;
+        importTotal = items.Length;
+
+        if(!WaitForImport()) return false;
+        isImporting = true;
+
+        RequestItemTuple@[] requests = {};
+        for(uint i = 0; i < items.Length; i++) {
+            auto item = items[i];
+            auto itemFolder = GetItemFolder(item);
+            CreateFolderRecursive(downloadFolder, itemFolder);
+            string filePath = downloadFolder + itemFolder + item.FileName;
+
+            if(!IO::FileExists(filePath)) {
+                string url = "https://" + MXURL + "/item/download/" + item.ID;                
+                auto request = Net::HttpGet(url);
+                requests.InsertLast(RequestItemTuple(request, item));
+            } else {
+                // file already exists in downloads cache, increment counter
+                importFinished++;
+            }
+        }
+
+        // Wait for all downloads to complete
+        while(true) {
+            for(uint i = requests.Length - 1; i >= 0; i--) {
+                auto ri = requests[i];
+                if(!ri.request.Finished())
+                    continue;
+                importFinished++;
+                requests.RemoveAt(i);
+                auto code = ri.request.ResponseCode();
+                if(code < 200 || code >= 300) {
+                    warn("Error making request to '" + ri.request.Url + "' error code: " + code);
+                    continue;
+                }
+                string filePath = downloadFolder + GetItemFolder(ri.item) + ri.item.FileName;
+                ri.request.SaveToFile(filePath);
+            }
+            if(importFinished == importTotal) 
+                break;
+            yield();
+        }
+
+        for(uint i = 0; i < items.Length; i++) {
+            auto item = items[i];
+            auto itemFolder = GetItemFolder(item);
+            string filePath = downloadFolder + itemFolder + item.FileName;
+            string desiredItemLocation = itemFolder + item.FileName;
+            LoadItem(filePath, desiredItemLocation);
+            yield();
+        }
+
+        isImporting = false;
+        return true;
+    }
+
+    bool ImportItem(IX::Item@ item, string desiredItemLocation = '') {
+        if(!WaitForImport()) return false;
         isImporting = true;
 
         string itemFolder = item.Username + '/';
-        if(!IO::FolderExists(downloadFolder + itemFolder)) IO::CreateFolder(downloadFolder + itemFolder);
         if(item.SetID != 0) {
-            itemFolder += item.SetID + '/';
-            if(!IO::FolderExists(downloadFolder + itemFolder)) IO::CreateFolder(downloadFolder + itemFolder);
+            itemFolder += item.SetName + '/';
         }
-
+        CreateFolderRecursive(downloadFolder, itemFolder);
+        
         string filePath = downloadFolder + itemFolder + item.FileName;
         if(!IO::FileExists(filePath)) {
             API::DownloadToFile("https://" + MXURL + "/item/download/" + item.ID, filePath);
@@ -70,10 +178,10 @@ class EditorIX {
             return;
         }
 
-        MyYield();
+        yield();
         // Click "create new item" button
         editor.ButtonItemNewModeOnClick();
-        MyYield();
+        yield();
         
         // Click screen at position to enter "create new item" UI
         auto screenWidth = Draw::GetWidth();
@@ -81,23 +189,23 @@ class EditorIX {
         auto xClick = screenOffsetLeft + screenWidth / 2;
         auto yClick = screenOffsetTop + screenHeight / 2;
         mousePosFun.Call(xClick, yClick - 2);
-        MyYield();
+        yield();
         mousePosFun.Call(xClick, yClick - 1);
-        MyYield();
+        yield();
         clickFun.Call(true, xClick, yClick);
-        MyYield();
+        yield();
 
         // Save empty item to file
         auto editorItem = cast<CGameEditorItem>(app.Editor);
         editorItem.FileSaveAs();
-        MyYield();
-        MyYield();
+        yield();
+        yield();
         app.BasicDialogs.String = desiredItemLocation;
-        MyYield();
+        yield();
         app.BasicDialogs.DialogSaveAs_OnValidate();
-        MyYield();
+        yield();
         app.BasicDialogs.DialogSaveAs_OnValidate();
-        MyYield();
+        yield();
         
         // Exit "create new item" UI
         editorItem.Exit();
@@ -112,21 +220,21 @@ class EditorIX {
         
         // Wait until exited item UI
         while(cast<CGameEditorItem>(app.Editor) !is null){
-            MyYield();
+            yield();
             print("Waiting");
         }
 
         // Click "edit item" button
         editor.ButtonItemEditModeOnClick();
         
-        MyYield();
+        yield();
         mousePosFun.Call(true, xClick, yClick - 1);
         auto maxLoops = 100; // 1 seconds
         auto i = 0;
         // Click screen until we're in "edit item" UI
         while(true){
             clickFun.Call(true, xClick, yClick - 2);
-            MyYield();
+            yield();
             @editorItem = cast<CGameEditorItem>(app.Editor);
             if(editorItem !is null)
                 break;
@@ -141,7 +249,7 @@ class EditorIX {
 
         // Wait until exited item UI
         while(cast<CGameEditorItem>(app.Editor) !is null){
-            MyYield();
+            yield();
             print("Waiting");
         }
 
@@ -152,10 +260,6 @@ class EditorIX {
         // editor.PluginMapType.Undo();
 
         print("IX DONE");
-    }
-
-    void MyYield(){
-        yield();
     }
 
     bool CopyFile(string fromFile, string toFile, bool overwrite = true){

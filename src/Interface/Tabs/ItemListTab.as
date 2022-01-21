@@ -105,17 +105,15 @@ class ItemListTab : Tab {
             }
             UI::BeginChild("itemList");
             if (UI::BeginTable("List", 7)) {
-                UI::TableSetupScrollFreeze(0, 1);
-                PushTabStyle();
-                UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 50);
+                UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 45);
                 UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch, 3);
                 UI::TableSetupColumn("By", UI::TableColumnFlags::WidthStretch, 1);
                 UI::TableSetupColumn(Icons::Trophy, UI::TableColumnFlags::WidthFixed, 40);
                 UI::TableSetupColumn(Icons::Bolt, UI::TableColumnFlags::WidthFixed, 40);
                 UI::TableSetupColumn(Icons::Kenney::Save, UI::TableColumnFlags::WidthFixed, 70);
-                UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 90);
+                UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 70);
+                UI::TableSetupScrollFreeze(7, 1);
                 UI::TableHeadersRow();
-                PopTabStyle();
                 for(uint i = 0; i < items.Length; i++) {
                     UI::PushID("ResItem"+i);
                     IX::Item@ item = items[i];

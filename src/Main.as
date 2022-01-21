@@ -6,6 +6,8 @@
 // maybe more stuff in download manager
 // MORE STUFF
 // replace all images with IfaceRender::image
+// add import item array button
+// add import by zip?
 
 
 EditorIX@ editorIX = null;
@@ -15,7 +17,7 @@ void Main() {
     startnew(IX::GetAllItemTags);
     // for dev
     sleep(100);
-    ixMenu.AddTab(ItemSetTab(11261));
+    ixMenu.AddTab(ItemSetTab(11270));
 }
 
 void RenderMenu() {

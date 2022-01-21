@@ -62,17 +62,16 @@ namespace IfaceRender {
         UI::Separator();
     }
 
-    void ItemRow(IX::Item@ item){
+    // dense version is 4 rows, otherwise 7 rows
+    void ItemRow(IX::Item@ item, bool dense = false){
         UI::TableNextRow();
         UI::TableSetColumnIndex(0);
 
-        IfaceRender::Image("https://" + MXURL + "/item/icon/" + item.ID, 50);
+        IfaceRender::Image("https://" + MXURL + "/item/icon/" + item.ID, 40);
 
-        UI::TableSetColumnIndex(1);
+        UI::TableNextColumn();
         
         // Item Type Icon
-        UI::SetNextWindowContentSize(50, 50);
-        auto dl = UI::GetWindowDrawList();
         IfaceRender::ItemType(item);
         UI::SameLine();
 
@@ -82,19 +81,21 @@ namespace IfaceRender {
         // Item Tags on newline
         IfaceRender::Tags(item.Tags);
 
-        UI::TableSetColumnIndex(2);
-        UI::Text(item.Username);
+        if(!dense) {
+            UI::TableNextColumn();
+            UI::Text(item.Username);
 
-        UI::TableSetColumnIndex(3);
-        UI::Text(tostring(item.LikeCount));
+            UI::TableNextColumn();
+            UI::Text(tostring(item.LikeCount));
 
-        UI::TableSetColumnIndex(4);
-        UI::Text(tostring(item.Score));
+            UI::TableNextColumn();
+            UI::Text(tostring(item.Score));
+        }
 
-        UI::TableSetColumnIndex(5);
+        UI::TableNextColumn();
         UI::Text(tostring(item.FileSize) + ' KB');
 
-        UI::TableSetColumnIndex(6);
+        UI::TableNextColumn();
         if (UI::GreenButton(Icons::InfoCircle)) {
             ixMenu.AddTab(ItemTab(item.ID), true);
         }

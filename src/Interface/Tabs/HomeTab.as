@@ -3,8 +3,49 @@ class HomePageTab : Tab {
 
     vec4 GetColor() override { return pluginColorVec; }
 
+    void RenderHome () {                
+        if (UI::Button(Icons::KeyboardO + " \\$zContact ManiaExchange")) OpenBrowserURL("https://"+MXURL+"/messaging/compose/11");
+        UI::SameLine();
+        if (UI::RedButton(Icons::Heart + " \\$zSupport ManiaExchange")) OpenBrowserURL("https://trackmania.exchange/support");
+
+        UI::Text("Follow the ManiaExchange network on");
+        UI::SameLine();
+        if (UI::Button(Icons::Facebook + " Facebook")) OpenBrowserURL("https://facebook.com/maniaexchange/");
+        UI::SameLine();
+        if (UI::Button(Icons::Twitter + " Twitter")) OpenBrowserURL("https://twitter.com/maniaexchange/");
+        UI::SameLine();
+        if (UI::Button(Icons::YoutubePlay + " YouTube")) OpenBrowserURL("https://youtube.com/maniaexchangetracks/");
+        UI::SameLine();
+        if (UI::Button(Icons::DiscordAlt + " Discord")) OpenBrowserURL("https://discord.mania.exchange/");
+
+        UI::Separator();
+
+        auto executingPlugin = Meta::ExecutingPlugin();
+        UI::Text(pluginColor + Icons::Plug);
+        UI::SameLine();
+        UI::Text("Plugin");
+        UI::Text("Made by \\$777" + executingPlugin.Author + " (forked from Greep's ManiaExchange plugin)");
+        UI::Text("Version \\$777" + executingPlugin.Version);
+        UI::Text("Plugin ID \\$777" + executingPlugin.ID);
+        UI::Text("Site ID \\$777" + executingPlugin.SiteID);
+        UI::Text("Type \\$777" + changeEnumStyle(tostring(executingPlugin.Type)));
+        if (IsDevMode()) {
+            UI::SameLine();
+            UI::Text("\\$777(\\$f39"+Icons::Code+" \\$777Dev mode)");
+        }
+        if (UI::Button(Icons::Kenney::GithubAlt + " Github")) OpenBrowserURL(repoURL);
+        UI::SameLine();
+        if (UI::Button(Icons::Heartbeat + " Plugin Home")) OpenBrowserURL("https://openplanet.nl/files/" + executingPlugin.SiteID);
+        
+        UI::Separator();
+        UI::Text("\\$f39" + Icons::Heartbeat);
+        UI::SameLine();
+        UI::Text("Openplanet");
+        UI::Text("Version \\$777" + Meta::OpenplanetBuildInfo());
+    }
+
     void Render() override {
-        float width = (UI::GetWindowSize().x*0.35)*0.5;
+        float width = (UI::GetWindowSize().x * 0.35) * 0.5;
         vec2 posTop = UI::GetCursorPos();
 
         UI::BeginChild("Summary", vec2(width,0));
@@ -18,21 +59,12 @@ class HomePageTab : Tab {
         UI::Text("Welcome to " + pluginName);
         UI::PopFont();
         UI::PushFont(ixMenu.g_fontHeader2);
-        UI::TextDisabled("The content network for Trackmania - driven by the community.");
+        UI::TextDisabled("Select one of the tabs to begin.");
         UI::PopFont();
 
         UI::Separator();
 
-        UI::BeginTabBar("HomePageTabs");
-        if(UI::BeginTabItem(Icons::Home + " Welcome!")){
-            HomePageTabRender::Home();
-            UI::EndTabItem();
-        }
-        if(UI::BeginTabItem(Icons::InfoCircle + " About")){
-            HomePageTabRender::About();
-            UI::EndTabItem();
-        }
-        UI::EndTabBar();
+        RenderHome();
         UI::EndChild();
     }
 };

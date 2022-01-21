@@ -100,24 +100,84 @@ class ItemSetTab : Tab {
             IfaceRender::IXComment(itemSet.Description);
         }
 
-        if(itemSet.Items.Length > 0) {
+        if(itemSet.contentTree !is null) {
             IfaceRender::TabHeader(Icons::FolderOpen + " Contents");
-            UI::Text("Contents here");
+            RenderTreeItems(itemSet.contentTree);
+            UI::Dummy(vec2(100, 100));
         }
 
 
         UI::EndChild();
     }
+    
+    void RenderContentTree(string name, dictionary@ tree, int level = 0) {
+        if(UI::CollapsingHeader(name)) {
+            RenderTreeItems(tree, level);
+        }
+    }
 
-    bool SequenceEquals(string[]@ s1, string[]@ s2) {
-        if(s1.Length != s2.Length) {
-            return false;
-        }
-        for(uint i = 0; i < s1.Length; i++) {
-            if(s1[i] != s2[i]) {
-                return false;
+    void RenderTreeItems(dictionary@ tree, int level = 0) {
+        auto keys = tree.GetKeys();
+        for(uint i = 0; i < keys.Length; i++) {
+            if(keys[i] == IX::TreeItemsKey) {
+                IX::Item@[]@ items;
+                if(!tree.Get(keys[i], @items)){
+                    warn("Can't get array: " + keys[i]);
+                    continue;
+                }
+                if (UI::BeginTable("List", 4)) {
+                    UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 45);
+                    UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 3);
+                    UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 45);
+                    UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 70);
+                    for(uint j = 0; j < items.Length; j++){
+                        Indent(level);
+                        IfaceRender::ItemRow(items[j], true);
+                    }
+                    UI::EndTable();
+                }
+                continue;
             }
+
+            dictionary@ innerTree;
+            if(!tree.Get(keys[i], @innerTree)){
+                warn("Can't get child dict: " + keys[i]);
+                continue;
+            }
+            
+            Indent(level);
+            if(UI::TransparentButton(Icons::Download)){
+                // ImportTree(tree);
+                print("Press button");
+                IX::PrintTree(innerTree);
+            }
+            
+            if (UI::IsItemHovered()) {
+                UI::BeginTooltip();
+                UI::Text("Import part of set");
+                UI::EndTooltip();
+            }
+
+            UI::SameLine();
+            RenderContentTree(keys[i], innerTree, level + 1);
         }
-        return true;
+    }
+
+    void Indent(int level) {
+        if(level == 0) return;
+        UI::Dummy(vec2(level * 15, 0));
+        UI::SameLine();
+    }
+
+    void ImportTree(dictionary@ tree) {
+        print("Import tree!");
+        IX::PrintTree(tree);
+        auto items = IX::TreeToArray(tree);
+        startnew(ImportItems, items);
     }
 };
+
+
+void ImportItems(ref@ items){
+    editorIX.ImportItems(cast<IX::Item@[]>(items));
+}

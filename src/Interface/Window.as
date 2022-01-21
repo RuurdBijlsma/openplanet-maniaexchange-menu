@@ -13,7 +13,7 @@ class Window {
 
     Window() {
         AddTab(HomePageTab());
-        AddTab(TestTab());
+        AddTab(TestTab(), true);
     }
 
     void AddTab(Tab@ tab, bool select = false){
@@ -31,7 +31,7 @@ class Window {
 
         UI::PushStyleColor(UI::Col::WindowBg,vec4(0,0,0,1));
 
-        UI::SetNextWindowSize(800, 500);
+        UI::SetNextWindowSize(820, 500);
         if(UI::Begin(nameMenu + " \\$666v"+Meta::ExecutingPlugin().Version, isOpened)){
             // Push the last active tab style so that the separator line is colored (this is drawn in BeginTabBar)
             auto lastActiveTab = c_lastActiveTab;

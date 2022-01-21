@@ -24,6 +24,35 @@ namespace IX {
         }
     }
 
+    IX::Item@[] TreeToArray(dictionary@ tree) {
+        IX::Item@[] items = {};
+        auto keys = tree.GetKeys();
+        for(uint i = 0; i < keys.Length; i++) {
+            if(keys[i] == IX::TreeItemsKey) {
+                IX::Item@[]@ childItems;
+                if(!tree.Get(keys[i], @childItems)){
+                    warn("Can't get array: " + keys[i]);
+                    continue;
+                }
+                for(uint j = 0; j < childItems.Length; j++) {
+                    items.InsertLast(childItems[j]);
+                }
+            }
+
+            dictionary@ innerTree;
+            if(!tree.Get(keys[i], @innerTree)){
+                warn("Can't get child dict: " + keys[i]);
+                continue;
+            }
+            
+            auto childItems = TreeToArray(innerTree);
+            for(uint j = 0; j < childItems.Length; j++) {
+                items.InsertLast(childItems[j]);
+            }
+        }
+        return items;
+    }
+
     array<ItemTag@> ParseItemTags(Json::Value json){
         array<ItemTag@> tags = {};
         if (json.GetType() != Json::Type::Null) {
@@ -127,11 +156,8 @@ namespace IX {
         dictionary@ tree = {};
         for(uint i = 0; i < items.Length; i++) {
             auto item = items[i];
-            print("Item dir: " + item.Directory);
             auto parts = item.Directory.Split("\\");
             dictionary@ node = tree;
-            bool cont = false;
-            // print("0 Setting current node to root");
             // create children if needed
             for(uint j = 0; j < parts.Length; j++) {
                 dictionary@ childNode;
@@ -140,19 +166,20 @@ namespace IX {
                 } else {
                     print(parts[j] + " does not exist on this node");
                     // if child node doesn't exist yet, create
-                    dictionary@ tempNode = {};
-                    node[parts[j]] = tempNode;
+                    @childNode = {};
+                    node[parts[j]] = childNode;
                     @node = cast<dictionary@>(node[parts[j]]);
+                    // @node = @childNode;
                 }
             }
             // node is now equal to item directory
-            IX::Item@[]@ items;
-            if(!node.Get(TreeItemsKey, @items)) {
-                @items = {};
-                node[TreeItemsKey] = items;
-                @items = cast<IX::Item@[]@>(node[TreeItemsKey]);
+            IX::Item@[]@ childItems;
+            if(!node.Get(TreeItemsKey, @childItems)) {
+                @childItems = {};
+                node[TreeItemsKey] = childItems;
+                @childItems = cast<IX::Item@[]@>(node[TreeItemsKey]);
             }
-            items.InsertLast(item);
+            childItems.InsertLast(item);
         }
 
         // debug stuff
