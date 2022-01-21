@@ -121,10 +121,11 @@ class ItemSetTab : Tab {
         for(uint i = 0; i < keys.Length; i++) {
             if(keys[i] == IX::TreeItemsKey) {
                 IX::Item@[]@ items;
-                if(!tree.Get(keys[i], @items)){
+                if(!tree.Get(keys[i], @items)) {
                     warn("Can't get array: " + keys[i]);
                     continue;
                 }
+                Indent(level);
                 if (UI::BeginTable("List", 4)) {
                     UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 45);
                     UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 3);
@@ -146,7 +147,7 @@ class ItemSetTab : Tab {
             }
             
             Indent(level);
-            if(UI::TransparentButton(Icons::Download)){
+            if(UI::TransparentButton(Icons::Download + "##" + level + keys[i])) {
                 // ImportTree(tree);
                 print("Press button");
                 IX::PrintTree(innerTree);
