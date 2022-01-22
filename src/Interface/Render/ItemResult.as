@@ -63,8 +63,12 @@ namespace IfaceRender {
     }
 
     // dense version is 4 rows, otherwise 7 rows
-    void ItemRow(IX::Item@ item, bool dense = false){
+    void ItemRow(IX::Item@ item, bool dense = false) {
+        UI::Dummy(vec2(0, 7));
+        UI::Separator();
+
         UI::TableNextRow();
+
         UI::TableSetColumnIndex(0);
 
         IfaceRender::Image("https://" + MXURL + "/item/icon/" + item.ID, 40);

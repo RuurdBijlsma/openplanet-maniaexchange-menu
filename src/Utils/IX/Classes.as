@@ -1,5 +1,5 @@
 namespace IX {
-    void PrintTree(dictionary@ tree, string indent = ""){
+    void PrintTree(const dictionary &in tree, string indent = ""){
         auto keys = tree.GetKeys();
         for(uint i = 0; i < keys.Length; i++) {
 
@@ -24,7 +24,11 @@ namespace IX {
         }
     }
 
-    IX::Item@[] TreeToArray(dictionary@ tree) {
+    IX::Item@[] TreeToArray(const dictionary &in tree) {
+        if(tree is null) {
+            warn("Tree to array parameter `tree` can't be null, aborting");
+            return {};
+        }
         IX::Item@[] items = {};
         auto keys = tree.GetKeys();
         for(uint i = 0; i < keys.Length; i++) {
@@ -37,11 +41,17 @@ namespace IX {
                 for(uint j = 0; j < childItems.Length; j++) {
                     items.InsertLast(childItems[j]);
                 }
+                continue;
             }
 
             dictionary@ innerTree;
             if(!tree.Get(keys[i], @innerTree)){
                 warn("Can't get child dict: " + keys[i]);
+                continue;
+            }
+
+            if(innerTree is null){
+                warn("Child dict is null! key = " + keys[i]);
                 continue;
             }
             
@@ -73,6 +83,42 @@ namespace IX {
             }
         }
         return tags;
+    }
+
+    // unique key that can't occur naturally in itemset content folder structure
+    const string TreeItemsKey = "items_-*-_-*-_.-*-._>_<:()";
+    dictionary@ CreateContentTree(IX::Item@[] items) {
+        dictionary@ tree = {};
+        for(uint i = 0; i < items.Length; i++) {
+            auto item = items[i];
+            auto parts = item.Directory.Split("\\");
+            dictionary@ node = tree;
+            // create children if needed
+            for(uint j = 0; j < parts.Length; j++) {
+                dictionary@ childNode;
+                if(node.Get(parts[j], @childNode)) {
+                    @node = childNode;
+                } else {
+                    // if child node doesn't exist yet, create
+                    @childNode = {};
+                    node[parts[j]] = childNode;
+                    @node = cast<dictionary@>(node[parts[j]]);
+                    // @node = @childNode;
+                }
+            }
+            // node is now equal to item directory
+            IX::Item@[]@ childItems;
+            if(!node.Get(TreeItemsKey, @childItems)) {
+                @childItems = {};
+                node[TreeItemsKey] = childItems;
+                @childItems = cast<IX::Item@[]@>(node[TreeItemsKey]);
+            }
+            childItems.InsertLast(item);
+        }
+
+        // debug stuff
+        PrintTree(tree);
+        return tree;
     }
 
     class Item {
@@ -147,59 +193,6 @@ namespace IX {
             }
         }
     };
-
-    //todo createcontentree is only creating 1 level of dir at a time
-
-    // unique key that can't occur naturally in itemset content folder structure
-    const string TreeItemsKey = "items_-*-_-*-_.-*-._>_<:()";
-    dictionary@ CreateContentTree(IX::Item@[] items) {
-        dictionary@ tree = {};
-        for(uint i = 0; i < items.Length; i++) {
-            auto item = items[i];
-            auto parts = item.Directory.Split("\\");
-            dictionary@ node = tree;
-            // create children if needed
-            for(uint j = 0; j < parts.Length; j++) {
-                dictionary@ childNode;
-                if(node.Get(parts[j], @childNode)) {
-                    @node = childNode;
-                } else {
-                    print(parts[j] + " does not exist on this node");
-                    // if child node doesn't exist yet, create
-                    @childNode = {};
-                    node[parts[j]] = childNode;
-                    @node = cast<dictionary@>(node[parts[j]]);
-                    // @node = @childNode;
-                }
-            }
-            // node is now equal to item directory
-            IX::Item@[]@ childItems;
-            if(!node.Get(TreeItemsKey, @childItems)) {
-                @childItems = {};
-                node[TreeItemsKey] = childItems;
-                @childItems = cast<IX::Item@[]@>(node[TreeItemsKey]);
-            }
-            childItems.InsertLast(item);
-        }
-
-        // debug stuff
-        PrintTree(tree);
-        // dictionary@ ims = cast<dictionary@>(tree['Items']);
-        // if(ims is null) warn("ims is null");
-        // print("Keys in ims: " + string::Join(ims.GetKeys(), ','));
-        // dictionary@ Grass = cast<dictionary@>(ims['Grass']);
-        // if(Grass is null) warn("Grass is null");
-        // print("Keys in Grass: " + string::Join(Grass.GetKeys(), ','));
-        // dictionary@ StartEnd = cast<dictionary@>(Grass['Start-End']);
-        // if(StartEnd is null) warn("StartEnd is null");
-        // print("Keys in startend: " + string::Join(StartEnd.GetKeys(), ','));
-        // dictionary@ Dirt = cast<dictionary@>(StartEnd['Dirt']);
-        // if(Dirt is null) warn("Dirt is null");
-        // IX::Item@[]@ itemsArray = cast<IX::Item@[]@>(Dirt[TreeItemsKey]);
-        // if(itemsArray is null) warn("itemsArray is null");
-        // print("Items in items>grass>start-end>dirt length: " + itemsArray.Length);
-        return tree;
-    }
 
     class ItemSet {
         int64 ID; //ItemExchange Set identifier

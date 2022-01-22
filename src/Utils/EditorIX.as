@@ -90,8 +90,11 @@ class EditorIX {
     string GetItemFolder(IX::Item@ item) {
         string itemFolder = item.Username + '/';
         if(item.SetID != 0) {
-            itemFolder += item.SetName + '/';
+            // itemFolder += item.SetName.Replace('/', '-') + '/';
+            if(item.Directory != "")
+                itemFolder += item.Directory.Replace("\\", "/") + '/';
         }
+        print(itemFolder);
         return itemFolder;
     }
 
@@ -121,7 +124,8 @@ class EditorIX {
 
         // Wait for all downloads to complete
         while(true) {
-            for(uint i = requests.Length - 1; i >= 0; i--) {
+            for(int i = int(requests.Length) - 1; i >= 0; i--) {
+                print(tostring(i) + ", " + tostring(requests.Length));
                 auto ri = requests[i];
                 if(!ri.request.Finished())
                     continue;

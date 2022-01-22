@@ -79,7 +79,7 @@ namespace IfaceRender {
         }
 
         if(loading) UI::BeginDisabled();
-        if(ixMenu.isInEditor && UI::CyanButton(icon + extraText)) {
+        if((loading || ixMenu.isInEditor) && UI::CyanButton(icon + extraText)) {
             startnew(ImportItem, item);
         }
         if(loading) UI::EndDisabled();

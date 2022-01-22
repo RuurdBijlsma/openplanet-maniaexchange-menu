@@ -1,15 +1,17 @@
 ﻿// TODO:
-// Show search results in ui
-// Support blocks
-// Show item set contents in ui (try lazy loading to ease on image loading)
-// make import item set button
-// maybe more stuff in download manager
-// MORE STUFF
-// replace all images with IfaceRender::image
-// add import item array button
-// add import by zip?
+// ----------- [ higher priority ] -----------
+// if item exist already, don't import when doing ImportTree
 // if there is a cached gbx item file, show button to delete the cache for it
+// add generelized import tree button
+// ----------- [ low priority ] -----------
+// Show search results in ui
 // add import method without dll if dll is not found
+// maybe more stuff in download manager
+// ----------- [ lowest priority ] -----------
+// Support blocks
+// add import by zip?
+// add setting for how directory structure should be made (completely flat/include author/include setname/use set directory)
+
 
 
 EditorIX@ editorIX = null;
@@ -17,9 +19,9 @@ EditorIX@ editorIX = null;
 void Main() {
     @editorIX = EditorIX();
     startnew(IX::GetAllItemTags);
-    // for dev
+    // for dev:
     sleep(100);
-    ixMenu.AddTab(ItemSetTab(11270));
+    ixMenu.AddTab(ItemSetTab(11270), true);
 }
 
 void RenderMenu() {
@@ -33,7 +35,6 @@ void RenderMenu() {
 }
 
 void RenderMenuMain(){
-    return;
     if(UI::BeginMenu(nameMenu + (IX::APIDown ? " \\$f00"+Icons::Server : ""))) {
         if (!IX::APIDown) {
             if(UI::MenuItem(pluginColor + Icons::WindowMaximize+"\\$z Open "+shortMXName+" menu", "", ixMenu.isOpened)) {

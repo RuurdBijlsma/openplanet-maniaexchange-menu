@@ -110,13 +110,13 @@ class ItemSetTab : Tab {
         UI::EndChild();
     }
     
-    void RenderContentTree(string name, dictionary@ tree, int level = 0) {
+    void RenderContentTree(string name, const dictionary &in tree, int level = 0) {
         if(UI::CollapsingHeader(name)) {
             RenderTreeItems(tree, level);
         }
     }
 
-    void RenderTreeItems(dictionary@ tree, int level = 0) {
+    void RenderTreeItems(const dictionary &in tree, int level = 0) {
         auto keys = tree.GetKeys();
         for(uint i = 0; i < keys.Length; i++) {
             if(keys[i] == IX::TreeItemsKey) {
@@ -148,9 +148,7 @@ class ItemSetTab : Tab {
             
             Indent(level);
             if(UI::TransparentButton(Icons::Download + "##" + level + keys[i])) {
-                // ImportTree(tree);
-                print("Press button");
-                IX::PrintTree(innerTree);
+                ImportTree(innerTree);
             }
             
             if (UI::IsItemHovered()) {
@@ -170,15 +168,18 @@ class ItemSetTab : Tab {
         UI::SameLine();
     }
 
-    void ImportTree(dictionary@ tree) {
+    void ImportTree(dictionary &in tree) {
         print("Import tree!");
         IX::PrintTree(tree);
         auto items = IX::TreeToArray(tree);
-        startnew(ImportItems, items);
+        if(items.Length > 0)
+            startnew(ImportItems, items);
     }
 };
 
 
-void ImportItems(ref@ items){
-    editorIX.ImportItems(cast<IX::Item@[]>(items));
+void ImportItems(ref@ itemsRef){
+    auto items = cast<IX::Item@[]>(itemsRef);
+    print("Import " + items.Length + " items");
+    editorIX.ImportItems(items);
 }
