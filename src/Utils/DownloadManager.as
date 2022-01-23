@@ -7,6 +7,19 @@ enum EGetStatus {
 class DownloadManager { 
     dictionary cache = {};
     string[] downloads = {};
+    dictionary itemDownloads = {};
+
+    bool IsItemDownloaded(int id) {
+        bool downloaded;
+        if(itemDownloads.Get(tostring(id), downloaded))
+            return downloaded;
+        itemDownloads.Set(tostring(id), false);
+        return false;
+    }
+
+    void SetItemDownloaded(int id, bool isDownloaded) {
+        itemDownloads.Set(tostring(id), isDownloaded);
+    }
 
     void CacheItem(IX::Item@ item) {
         cache.Set('item' + item.ID, @item);

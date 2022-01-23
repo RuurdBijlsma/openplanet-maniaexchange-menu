@@ -187,10 +187,40 @@ namespace IX {
                 FileSize = json["FileSize"];
                 HasThumbnail = json["HasThumbnail"];
                 Tags = ParseItemTags(json["Tags"]);
+                downloader.SetItemDownloaded(this.ID, IO::FileExists(GetDestinationPath()));
             } catch {
                 Name = json["Name"];
                 mxError("Error parsing Item: "+Name);
             }
+        }
+
+        bool get_IsStoredLocally() {
+            return downloader.IsItemDownloaded(this.ID);
+        }
+
+        void set_IsStoredLocally(bool value) {
+            downloader.SetItemDownloaded(this.ID, value);
+        }
+
+        string GetCachePath() {
+            auto relativeFolder = GetRelativeFolder();
+            return ixEditor.downloadFolder + relativeFolder + this.FileName;
+        }
+
+        string GetDestinationPath() {
+            auto itemsFolder = GetItemsFolder();
+            auto relativeFolder = GetRelativeFolder();
+            return itemsFolder + relativeFolder + this.FileName;
+        }
+
+        string GetRelativeFolder() {
+            string itemFolder = this.Username + '/';
+            if(this.SetID != 0) {
+                // itemFolder += item.SetName.Replace('/', '-') + '/';
+                if(this.Directory != "")
+                    itemFolder += this.Directory.Replace("\\", "/") + '/';
+            }
+            return itemFolder;
         }
     };
 

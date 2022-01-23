@@ -66,8 +66,26 @@ namespace IfaceRender {
         return (HourGlassValue == 0 ? Icons::HourglassStart : (HourGlassValue == 1 ? Icons::HourglassHalf : Icons::HourglassEnd));
     }
 
-    void ImportItemButton(IX::Item@ item, bool showText = false){
-        bool loading = editorIX.isImporting;
+
+    void ImportButton(EImportType importType, ref data, string buttonId, bool showText = false, bool transparentButton = false) {
+        if(importType == EImportType::Item) {
+            auto item = cast<IX::Item@>(data);
+            if(item.IsStoredLocally) {
+                string buttonText = Icons::Refresh + (showText ? " Update item" : "") + "##" + buttonId;
+                if(ixMenu.isInEditor && UI::RedButton(buttonText)) {
+                    print("Refresh button pressed");
+                    IO::Delete(item.GetCachePath());
+                    IO::Delete(item.GetDestinationPath());
+                    item.IsStoredLocally = false;
+                    startnew(ImportFunctions::Item, data);
+                } else {
+                    UI::NewLine();
+                }
+                return;
+            }
+        }
+
+        bool loading = ixEditor.isImporting;
 
         string icon = loading ? GetHourGlass() : Icons::Download;
 
@@ -77,10 +95,22 @@ namespace IfaceRender {
         }else if(loading && showText) {
             extraText += " Importing...";
         }
+        extraText += "##" + buttonId;
 
         if(loading) UI::BeginDisabled();
-        if((loading || ixMenu.isInEditor) && UI::CyanButton(icon + extraText)) {
-            startnew(ImportItem, item);
+        if((loading || ixMenu.isInEditor) && (transparentButton ? UI::TransparentButton(icon + extraText) : UI::CyanButton(icon + extraText))) {
+            if(importType == EImportType::Item) {
+                startnew(ImportFunctions::Item, data);
+            } else if(importType == EImportType::Tree) {
+                startnew(ImportFunctions::Tree, data);
+            }
+        } else {
+            UI::NewLine();
+        }
+        if(ixMenu.isInEditor && importType == EImportType::Tree && UI::IsItemHovered()) {
+            UI::BeginTooltip();
+            UI::Text("Import part of set");
+            UI::EndTooltip();
         }
         if(loading) UI::EndDisabled();
     }
@@ -96,6 +126,20 @@ namespace IfaceRender {
     }
 }
 
-void ImportItem(ref@ item){
-    editorIX.ImportItem(cast<IX::Item@>(item));
+enum EImportType {
+    Item, Tree
+};
+
+namespace ImportFunctions {
+    void Item(ref@ itemRef) {
+        auto item = cast<IX::Item@>(itemRef);
+        ixEditor.ImportItems({item});
+    }
+
+    void Tree(ref@ dictRef){
+        auto tree = cast<dictionary@>(dictRef);
+        auto items = IX::TreeToArray(tree);
+        print("Import " + items.Length + " items");
+        ixEditor.ImportItems(items);
+    }
 }

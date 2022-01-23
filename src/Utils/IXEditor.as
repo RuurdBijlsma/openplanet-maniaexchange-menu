@@ -7,7 +7,7 @@ class RequestItemTuple {
     }
 };
 
-class EditorIX {
+class IXEditor {
     Import::Library@ lib = null;
     Import::Function@ clickFun = null;
     Import::Function@ mousePosFun = null;
@@ -16,18 +16,12 @@ class EditorIX {
     int importTotal = 1;
     int importFinished = 0;
 
-    EditorIX (){
+    IXEditor (){
         print("Getting click dll");
         @lib = GetZippedLibrary("lib/libclick.dll");
-        @clickFun = lib.GetFunction("clickPos");
-        @mousePosFun = lib.GetFunction("moveMouse");
-        if(clickFun is null){
-            warn("clickFun is null");
-            return;
-        }
-        if(mousePosFun is null){
-            warn("mousePosFun is null");
-            return;
+        if(lib !is null) {
+            @clickFun = lib.GetFunction("clickPos");
+            @mousePosFun = lib.GetFunction("moveMouse");
         }
 
         auto opFolder = IO::FromDataFolder('');
@@ -87,17 +81,6 @@ class EditorIX {
         }
     }
 
-    string GetItemFolder(IX::Item@ item) {
-        string itemFolder = item.Username + '/';
-        if(item.SetID != 0) {
-            // itemFolder += item.SetName.Replace('/', '-') + '/';
-            if(item.Directory != "")
-                itemFolder += item.Directory.Replace("\\", "/") + '/';
-        }
-        print(itemFolder);
-        return itemFolder;
-    }
-
     bool ImportItems(IX::Item@[] items) {
         importFinished = 0;
         importTotal = items.Length;
@@ -108,12 +91,11 @@ class EditorIX {
         RequestItemTuple@[] requests = {};
         for(uint i = 0; i < items.Length; i++) {
             auto item = items[i];
-            auto itemFolder = GetItemFolder(item);
+            auto itemFolder = item.GetRelativeFolder();
             CreateFolderRecursive(downloadFolder, itemFolder);
-            string filePath = downloadFolder + itemFolder + item.FileName;
 
-            if(!IO::FileExists(filePath)) {
-                string url = "https://" + MXURL + "/item/download/" + item.ID;                
+            if(!IO::FileExists(item.GetCachePath())) {
+                auto url = "https://" + MXURL + "/item/download/" + item.ID;                
                 auto request = Net::HttpGet(url);
                 requests.InsertLast(RequestItemTuple(request, item));
             } else {
@@ -125,10 +107,10 @@ class EditorIX {
         // Wait for all downloads to complete
         while(true) {
             for(int i = int(requests.Length) - 1; i >= 0; i--) {
-                print(tostring(i) + ", " + tostring(requests.Length));
                 auto ri = requests[i];
                 if(!ri.request.Finished())
                     continue;
+                print("Item " + ri.item.Name + " finished!");
                 importFinished++;
                 requests.RemoveAt(i);
                 auto code = ri.request.ResponseCode();
@@ -136,8 +118,7 @@ class EditorIX {
                     warn("Error making request to '" + ri.request.Url + "' error code: " + code);
                     continue;
                 }
-                string filePath = downloadFolder + GetItemFolder(ri.item) + ri.item.FileName;
-                ri.request.SaveToFile(filePath);
+                ri.request.SaveToFile(ri.item.GetCachePath());
             }
             if(importFinished == importTotal) 
                 break;
@@ -146,10 +127,17 @@ class EditorIX {
 
         for(uint i = 0; i < items.Length; i++) {
             auto item = items[i];
-            auto itemFolder = GetItemFolder(item);
-            string filePath = downloadFolder + itemFolder + item.FileName;
+            auto itemFolder = item.GetRelativeFolder();
+            if(IO::FileExists(item.GetDestinationPath())){
+                // file already exists in items folder
+                continue;
+            }
             string desiredItemLocation = itemFolder + item.FileName;
-            LoadItem(filePath, desiredItemLocation);
+            if(LoadItem(item.GetCachePath(), desiredItemLocation)) {
+                item.IsStoredLocally = true;
+            } else {
+                UI::ShowNotification("Couldn't import item: " + item.Name);
+            }
             yield();
         }
 
@@ -157,50 +145,104 @@ class EditorIX {
         return true;
     }
 
-    bool ImportItem(IX::Item@ item, string desiredItemLocation = '') {
-        if(!WaitForImport()) return false;
-        isImporting = true;
-
-        string itemFolder = GetItemFolder(item);
-        CreateFolderRecursive(downloadFolder, itemFolder);
-        
-        string filePath = downloadFolder + itemFolder + item.FileName;
-        if(!IO::FileExists(filePath)) {
-            API::DownloadToFile("https://" + MXURL + "/item/download/" + item.ID, filePath);
-        }
-
-        if(desiredItemLocation == '')
-            desiredItemLocation = itemFolder + item.FileName;
-
-        LoadItem(filePath, desiredItemLocation);
-
-        isImporting = false;
-        return true;
+    void DrawText(string text) {
+        auto screenHeight = Draw::GetHeight();
+        auto screenWidth = Draw::GetWidth();
+        auto black = vec4(0, 0, 0, 1);
+        auto white = vec4(1, 1, 1, 1);
+        nvg::FontFace(ixMenu.g_fontRegularHeader);
+        nvg::FontSize(100);
+        nvg::FillColor(black);
+        nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
+        nvg::Text(screenWidth / 2 - 2, screenHeight / 4 - 2, text);
+        nvg::FillColor(white);
+        nvg::Text(screenWidth / 2, screenHeight / 4, text);
     }
 
-    void LoadItem(string gbxLocation, string desiredItemLocation) {
+    void EnterCreateNewItemUI(CTrackMania@ app) {
+        if(mousePosFun !is null && clickFun !is null) {
+            auto screenHeight = Draw::GetHeight();
+            auto screenWidth = Draw::GetWidth();
+            // Click screen at position to enter "create new item" UI
+            auto xClick = screenOffsetLeft + screenWidth / 2;
+            auto yClick = screenOffsetTop + screenHeight / 2;
+            mousePosFun.Call(xClick, yClick - 2);
+            yield();
+            mousePosFun.Call(xClick, yClick - 1);
+            yield();
+            clickFun.Call(true, xClick, yClick);
+        } else {
+            // make user click
+            auto maxLoops = 1000; // wait max 10 seconds for user to get to item editor
+            while(cast<CGameEditorItem>(app.Editor) is null) {
+                DrawText("Click in the map!");
+                yield();
+                if(maxLoops-- <= 0) {
+                    UI::ShowOverlay();
+                    return;
+                }
+                print("Waiting for user click");
+            }
+        }
+        UI::ShowOverlay();
+    }
+
+    bool EnterEditItemUI(CTrackMania@ app) {
+        if(mousePosFun !is null && clickFun !is null) {
+            auto screenWidth = Draw::GetWidth();
+            auto screenHeight = Draw::GetHeight();
+            auto xClick = screenOffsetLeft + screenWidth / 2;
+            auto yClick = screenOffsetTop + screenHeight / 2;
+            mousePosFun.Call(true, xClick, yClick - 1);
+            auto maxLoops = 100; // wait max 1 seconds
+            // Click screen until we're in "edit item" UI
+            while(true){
+                clickFun.Call(true, xClick, yClick - 2);
+                yield();
+                auto editorItem = cast<CGameEditorItem>(app.Editor);
+                if(editorItem !is null){
+                    UI::ShowOverlay();
+                    return true;
+                }
+                if(maxLoops-- <= 0){
+                    UI::ShowOverlay();
+                    return false;
+                }
+            }
+        } else {
+            // make user click on item
+            auto maxLoops = 1000; // wait max 10 seconds for user to get to item editor
+            while(cast<CGameEditorItem>(app.Editor) is null){
+                DrawText("Click the new cube!");
+                yield();
+                if(maxLoops-- <= 0) {
+                    UI::ShowOverlay();
+                    return false;
+                }
+                print("Waiting for user click");
+            }
+            UI::ShowOverlay();
+            return true;
+        }
+
+        return false;
+    }
+
+    bool LoadItem(string gbxLocation, string desiredItemLocation) {
         CTrackMania@ app = cast<CTrackMania>(GetApp());
         auto editor = cast<CGameCtnEditorCommon@>(app.Editor);
         if(editor is null) {
             print("Editor is null");
-            return;
+            return false;
         }
 
         yield();
         // Click "create new item" button
         editor.ButtonItemNewModeOnClick();
+        UI::HideOverlay();
         yield();
-        
-        // Click screen at position to enter "create new item" UI
-        auto screenWidth = Draw::GetWidth();
-        auto screenHeight = Draw::GetHeight();
-        auto xClick = screenOffsetLeft + screenWidth / 2;
-        auto yClick = screenOffsetTop + screenHeight / 2;
-        mousePosFun.Call(xClick, yClick - 2);
-        yield();
-        mousePosFun.Call(xClick, yClick - 1);
-        yield();
-        clickFun.Call(true, xClick, yClick);
+
+        EnterCreateNewItemUI(app);
         yield();
 
         // Save empty item to file
@@ -235,25 +277,15 @@ class EditorIX {
         // Click "edit item" button
         editor.ButtonItemEditModeOnClick();
         
+        UI::HideOverlay();
         yield();
-        mousePosFun.Call(true, xClick, yClick - 1);
-        auto maxLoops = 100; // 1 seconds
-        auto i = 0;
-        // Click screen until we're in "edit item" UI
-        while(true){
-            clickFun.Call(true, xClick, yClick - 2);
-            yield();
-            @editorItem = cast<CGameEditorItem>(app.Editor);
-            if(editorItem !is null)
-                break;
-            if(i++ > maxLoops){
-                error("ERROR getting to 'edit item' UI");
-                return;
-            }
+        if(!EnterEditItemUI(app)) {
+            error("ERROR getting to 'edit item' UI");
+            return false;
         }
 
         // Exit edit item UI
-        editorItem.Exit();
+        cast<CGameEditorItem>(app.Editor).Exit();
 
         // Wait until exited item UI
         while(cast<CGameEditorItem>(app.Editor) !is null){
@@ -268,6 +300,7 @@ class EditorIX {
         // editor.PluginMapType.Undo();
 
         print("IX DONE");
+        return true;
     }
 
     bool CopyFile(string fromFile, string toFile, bool overwrite = true){
@@ -289,13 +322,9 @@ class EditorIX {
         return true;
     }
 
-    string GetItemsFolder(){
-        return IO::FromDataFolder("").Split('/Openplanet')[0] + "\\Documents\\Trackmania\\Items\\";
-    }
-
     string GetPluginName(){
-        IO::FileSource info('info.toml');
-        return info.ReadToEnd().Replace(' ', '').Split('name="')[1].Split('"')[0];
+        auto executingPlugin = Meta::ExecutingPlugin();
+        return executingPlugin.Name;
     }
 
     Import::Library@ GetZippedLibrary(string relativeDllPath) {
@@ -311,14 +340,19 @@ class EditorIX {
         }
 
         if(!IO::FileExists(localDllFile)) {
-            print("Copying dll from zip to local! " + localDllFile);
-            IO::FileSource zippedDll(relativeDllPath);
-            auto buffer = zippedDll.Read(zippedDll.Size());
-            IO::File toItem(localDllFile, IO::FileMode::Write);
-            toItem.Write(buffer);
-            toItem.Close();
+            try {
+                IO::FileSource zippedDll(relativeDllPath);
+                print("Copying dll from zip to local! " + localDllFile);
+                auto buffer = zippedDll.Read(zippedDll.Size());
+                IO::File toItem(localDllFile, IO::FileMode::Write);
+                toItem.Write(buffer);
+                toItem.Close();
+            } catch {
+                print("Could not find dll in plugin contents");
+                return null;
+            }
         }
 
         return Import::GetLibrary(localDllFile);
     }
-}
+};

@@ -1,11 +1,7 @@
 ﻿// TODO:
 // ----------- [ higher priority ] -----------
-// if item exist already, don't import when doing ImportTree
-// if there is a cached gbx item file, show button to delete the cache for it
-// add generelized import tree button
 // ----------- [ low priority ] -----------
 // Show search results in ui
-// add import method without dll if dll is not found
 // maybe more stuff in download manager
 // ----------- [ lowest priority ] -----------
 // Support blocks
@@ -13,11 +9,10 @@
 // add setting for how directory structure should be made (completely flat/include author/include setname/use set directory)
 
 
-
-EditorIX@ editorIX = null;
+IXEditor@ ixEditor = null;
 
 void Main() {
-    @editorIX = EditorIX();
+    @ixEditor = IXEditor();
     startnew(IX::GetAllItemTags);
     // for dev:
     sleep(100);
@@ -27,7 +22,7 @@ void Main() {
 void RenderMenu() {
     if(UI::MenuItem(nameMenu + (IX::APIDown ? " \\$f00"+Icons::Server : ""), "", ixMenu.isOpened)) {
         if (IX::APIDown) {
-            Dialogs::Message("\\$f00"+Icons::Times+" \\$zSorry, "+pluginName+" is not responding.\nReload the plugin to try again.");
+            Dialogs::Message("\\$f00" + Icons::Times + " \\$zSorry, " + pluginName + " is not responding.\nReload the plugin to try again.");
         } else {
             ixMenu.isOpened = !ixMenu.isOpened;
         }
@@ -37,7 +32,7 @@ void RenderMenu() {
 void RenderMenuMain(){
     if(UI::BeginMenu(nameMenu + (IX::APIDown ? " \\$f00"+Icons::Server : ""))) {
         if (!IX::APIDown) {
-            if(UI::MenuItem(pluginColor + Icons::WindowMaximize+"\\$z Open "+shortMXName+" menu", "", ixMenu.isOpened)) {
+            if(UI::MenuItem(pluginColor + Icons::WindowMaximize+"\\$z Open " + shortMXName + " menu", "", ixMenu.isOpened)) {
                 ixMenu.isOpened = !ixMenu.isOpened;
             }
         } else {

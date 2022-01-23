@@ -112,7 +112,7 @@ class ItemTab : Tab {
 
         if(ixMenu.isInEditor) {
             UI::Separator();
-            IfaceRender::ImportItemButton(item, true);
+            IfaceRender::ImportButton(EImportType::Item, item, 'tab' + item.ID, true);
         }
 
         if(item.Description != "") {

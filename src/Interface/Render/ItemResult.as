@@ -55,7 +55,7 @@ namespace IfaceRender {
                 ixMenu.AddTab(ItemTab(item.ID), true);
             }
             UI::SameLine();
-            IfaceRender::ImportItemButton(item);
+            IfaceRender::ImportButton(EImportType::Item, item, 'block' + item.ID);
 
             UI::EndTable();
         }
@@ -104,6 +104,6 @@ namespace IfaceRender {
             ixMenu.AddTab(ItemTab(item.ID), true);
         }
         UI::SameLine();
-        IfaceRender::ImportItemButton(item);
+        IfaceRender::ImportButton(EImportType::Item, item, 'row' + item.ID);
     }
 }

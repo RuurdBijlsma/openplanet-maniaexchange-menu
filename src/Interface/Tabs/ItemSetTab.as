@@ -147,15 +147,7 @@ class ItemSetTab : Tab {
             }
             
             Indent(level);
-            if(UI::TransparentButton(Icons::Download + "##" + level + keys[i])) {
-                ImportTree(innerTree);
-            }
-            
-            if (UI::IsItemHovered()) {
-                UI::BeginTooltip();
-                UI::Text("Import part of set");
-                UI::EndTooltip();
-            }
+            IfaceRender::ImportButton(EImportType::Tree, innerTree, level + keys[i], false, true);
 
             UI::SameLine();
             RenderContentTree(keys[i], innerTree, level + 1);
@@ -167,19 +159,4 @@ class ItemSetTab : Tab {
         UI::Dummy(vec2(level * 15, 0));
         UI::SameLine();
     }
-
-    void ImportTree(dictionary &in tree) {
-        print("Import tree!");
-        IX::PrintTree(tree);
-        auto items = IX::TreeToArray(tree);
-        if(items.Length > 0)
-            startnew(ImportItems, items);
-    }
 };
-
-
-void ImportItems(ref@ itemsRef){
-    auto items = cast<IX::Item@[]>(itemsRef);
-    print("Import " + items.Length + " items");
-    editorIX.ImportItems(items);
-}

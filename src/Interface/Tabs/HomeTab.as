@@ -33,6 +33,18 @@ class HomePageTab : Tab {
             UI::SameLine();
             UI::Text("\\$777(\\$f39"+Icons::Code+" \\$777Dev mode)");
         }
+        bool dllLoaded = ixEditor.clickFun !is null && ixEditor.mousePosFun !is null;
+        UI::Text("Automated item imports " + (dllLoaded ? '\\$0f0' + Icons::Check : '\\$f00' + Icons::Times));
+        if(UI::IsItemHovered()) {
+            UI::BeginTooltip();
+            if(dllLoaded) {
+                UI::Text("This plugin has loaded the required DLL to automatically import items.");
+            } else {
+                UI::Text("This plugin does not have the required DLL to automatically import items.");
+                UI::Text("2 user clicks are required to import each item.");
+            }
+            UI::EndTooltip();
+        }
         if (UI::Button(Icons::Kenney::GithubAlt + " Github")) OpenBrowserURL(repoURL);
         UI::SameLine();
         if (UI::Button(Icons::Heartbeat + " Plugin Home")) OpenBrowserURL("https://openplanet.nl/files/" + executingPlugin.SiteID);
