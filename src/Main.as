@@ -1,5 +1,6 @@
 ﻿// TODO:
 // ----------- [ higher priority ] -----------
+// bug in content tree of set 10561 very laggy
 // ----------- [ low priority ] -----------
 // Show search results in ui
 // maybe more stuff in download manager
@@ -16,7 +17,7 @@ void Main() {
     startnew(IX::GetAllItemTags);
     // for dev:
     sleep(100);
-    ixMenu.AddTab(ItemSetTab(11270), true);
+    ixMenu.AddTab(ItemSetTab(10561), true);
 }
 
 void RenderMenu() {
