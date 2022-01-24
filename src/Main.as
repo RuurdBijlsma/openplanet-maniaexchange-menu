@@ -47,18 +47,13 @@ void RenderMenuMain() {
         }
         UI::Separator();
          if (UI::BeginMenu(pluginColor+Icons::InfoCircle + " \\$zAbout")){
-            if (UI::BeginMenu("\\$f00"+Icons::Heart + " \\$zSupport")){
-                if (UI::MenuItem(pluginColor+Icons::Heart + " \\$zSupport ManiaExchange")) OpenBrowserURL("https://"+MXURL+"/support");
-                if (UI::MenuItem(Icons::Heartbeat + " \\$zSupport the plugin creator")) OpenBrowserURL("https://github.com/sponsors/GreepTheSheep");
-                UI::EndMenu();
-            }
-            UI::Separator();
             if (UI::BeginMenu(pluginColor+Icons::KeyboardO + " \\$zContact")){
-                if (UI::MenuItem(pluginColor+Icons::KeyboardO + " \\$zContact ManiaExchange")) OpenBrowserURL("https://"+MXURL+"/messaging/compose/11");
-                if (UI::MenuItem(Icons::DiscordAlt + "Plugin's creator Discord")) OpenBrowserURL("https://greep.gq/discord");
+                if (UI::MenuItem(pluginColor+Icons::KeyboardO + " \\$zContact ManiaExchange")) OpenBrowserURL("https://" + MXURL + "/messaging/compose/11");
+                if (UI::MenuItem(Icons::Github + " Plugin creator's GitHub")) OpenBrowserURL("https://github.com/RuurdBijlsma");
                 UI::EndMenu();
             }
             UI::Separator();
+            if (UI::MenuItem(pluginColor+Icons::Heart + " \\$zSupport ManiaExchange")) OpenBrowserURL("https://trackmania.exchange/support");
             if (UI::MenuItem(pluginColor+Icons::Facebook + " \\$zManiaExchange on Facebook")) OpenBrowserURL("https://facebook.com/maniaexchange/");
             if (UI::MenuItem(pluginColor+Icons::Twitter + " \\$zManiaExchange on Twitter")) OpenBrowserURL("https://twitter.com/maniaexchange/");
             if (UI::MenuItem(pluginColor+Icons::YoutubePlay + " \\$zManiaExchange on YouTube")) OpenBrowserURL("https://youtube.com/maniaexchangetracks/");
@@ -68,9 +63,10 @@ void RenderMenuMain() {
         if (UI::BeginMenu("\\$f90"+Icons::CircleThin + " \\$zAdvanced")){
             UI::TextDisabled("Actual Repository URL: ");
             UI::TextDisabled(MXURL);
-            if (UI::MenuItem(pluginColor+Icons::ExternalLink + " \\$zOpen "+pluginName+" in browser")) OpenBrowserURL("https://"+MXURL);
+            if (UI::MenuItem(pluginColor+Icons::ExternalLink + " \\$zOpen "+pluginName+" in browser")) OpenBrowserURL("https://" + MXURL);
             UI::EndMenu();
         }
+        if(UI::MenuItem("\\$f33"+Icons::Github + " \\$zReport a plugin issue")) OpenBrowserURL("https://github.com/RuurdBijlsma/tm-item-exchange/issues");
         UI::EndMenu();
     }
 }
