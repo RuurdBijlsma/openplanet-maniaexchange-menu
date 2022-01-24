@@ -164,8 +164,8 @@ class IXEditor {
             auto screenHeight = Draw::GetHeight();
             auto screenWidth = Draw::GetWidth();
             // Click screen at position to enter "create new item" UI
-            auto xClick = screenOffsetLeft + screenWidth / 2;
-            auto yClick = screenOffsetTop + screenHeight / 2;
+            auto xClick = screenWidth / 2;
+            auto yClick = screenHeight / 2;
             mousePosFun.Call(xClick, yClick - 2);
             yield();
             mousePosFun.Call(xClick, yClick - 1);
@@ -191,8 +191,8 @@ class IXEditor {
         if(mousePosFun !is null && clickFun !is null) {
             auto screenWidth = Draw::GetWidth();
             auto screenHeight = Draw::GetHeight();
-            auto xClick = screenOffsetLeft + screenWidth / 2;
-            auto yClick = screenOffsetTop + screenHeight / 2;
+            auto xClick = screenWidth / 2;
+            auto yClick = screenHeight / 2;
             mousePosFun.Call(true, xClick, yClick - 1);
             auto maxLoops = 100; // wait max 1 seconds
             // Click screen until we're in "edit item" UI
@@ -232,7 +232,7 @@ class IXEditor {
         CTrackMania@ app = cast<CTrackMania>(GetApp());
         auto editor = cast<CGameCtnEditorCommon@>(app.Editor);
         if(editor is null) {
-            print("Editor is null");
+            warn("Editor is null");
             return false;
         }
 
@@ -247,6 +247,10 @@ class IXEditor {
 
         // Save empty item to file
         auto editorItem = cast<CGameEditorItem>(app.Editor);
+        if(editorItem is null){
+            warn("Editor item is null");
+            return false;
+        }
         editorItem.FileSaveAs();
         yield();
         yield();
@@ -328,6 +332,8 @@ class IXEditor {
     }
 
     Import::Library@ GetZippedLibrary(string relativeDllPath) {
+        bool preventCache = true;
+
         auto parts = relativeDllPath.Split("/");
         string fileName = parts[parts.Length - 1];
         const string baseFolder = IO::FromDataFolder('');
@@ -339,7 +345,7 @@ class IXEditor {
             IO::CreateFolder(dllFolder);
         }
 
-        if(!IO::FileExists(localDllFile)) {
+        if(preventCache || !IO::FileExists(localDllFile)) {
             try {
                 IO::FileSource zippedDll(relativeDllPath);
                 print("Copying dll from zip to local! " + localDllFile);

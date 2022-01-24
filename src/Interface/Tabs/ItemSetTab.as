@@ -59,6 +59,10 @@ class ItemSetTab : Tab {
         UI::EndChild();
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
         UI::BeginChild("ItemHeader");
+        UI::SetCursorPos(UI::GetCursorPos() + vec2(8, 0));
+        UI::PushStyleColor(UI::Col::ChildBg, vec4(0, 0, 0, 0));
+        UI::BeginChild("PaddedItem");
+        UI::Dummy(vec2(0, 1));
 
         UI::PushFont(ixMenu.g_fontTitle);
         UI::Text(itemSet.Name);
@@ -106,17 +110,18 @@ class ItemSetTab : Tab {
             UI::Dummy(vec2(100, 100));
         }
 
-
+        UI::EndChild();
+        UI::PopStyleColor(1);
         UI::EndChild();
     }
     
-    void RenderContentTree(string name, const dictionary &in tree, int level = 0) {
-        if(UI::CollapsingHeader(name)) {
-            RenderTreeItems(tree, level);
+    void RenderContentTree(string name, const dictionary &in tree, int level = 0, string id = "") {
+        if(UI::CollapsingHeader(name + "##" + id)) {
+            RenderTreeItems(tree, level, id);
         }
     }
 
-    void RenderTreeItems(const dictionary &in tree, int level = 0) {
+    void RenderTreeItems(const dictionary &in tree, int level = 0, string id = "") {
         auto keys = tree.GetKeys();
         for(uint i = 0; i < keys.Length; i++) {
             if(keys[i] == IX::TreeItemsKey) {
@@ -141,7 +146,7 @@ class ItemSetTab : Tab {
             }
 
             dictionary@ innerTree;
-            if(!tree.Get(keys[i], @innerTree)){
+            if(!tree.Get(keys[i], @innerTree)) {
                 warn("Can't get child dict: " + keys[i]);
                 continue;
             }
@@ -150,7 +155,7 @@ class ItemSetTab : Tab {
             IfaceRender::ImportButton(EImportType::Tree, innerTree, level + keys[i], false, true);
 
             UI::SameLine();
-            RenderContentTree(keys[i], innerTree, level + 1);
+            RenderContentTree(keys[i], innerTree, level + 1, id + "|" + keys[i] + "|" + level);
         }
     }
 

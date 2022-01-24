@@ -6,4 +6,4 @@ string gameName = "TMNEXT";
 string MXURL = "item.exchange";
 
 string nameMenu = pluginColor + Icons::Exchange + " \\$z" + pluginName;
-string repoURL = "https://github.com/RuurdBijlsma/tm-split-speeds";
+string repoURL = "https://github.com/RuurdBijlsma/tm-item-exchange";

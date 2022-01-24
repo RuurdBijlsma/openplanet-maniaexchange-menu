@@ -2,28 +2,35 @@ namespace IfaceRender {
     void ItemSetBlock(IX::ItemSet@ itemSet) {
         UI::Separator();
         if(UI::BeginTable("ItemSetBlock", 3)){
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 100);
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 90);
             UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 75);
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 40);
 
             UI::TableNextRow();
             UI::TableSetColumnIndex(0);
+            int imgHeight = 0;
             if(itemSet.ImageCount > 0)
-                IfaceRender::HoverImage("https://" + MXURL + "/set/image/" + itemSet.ID + "/1", 100);
+                imgHeight = IfaceRender::HoverImage("https://" + MXURL + "/set/image/" + itemSet.ID + "/1", 100);
+            // UI::AlignTextToFramePadding();
             UI::TableSetColumnIndex(1);
-            UI::PushStyleVar(UI::StyleVar::ItemSpacing, vec2(0, 20));
+            // UI::PushStyleVar(UI::StyleVar::ItemSpacing, vec2(0, 20));
+            int dummyHeight = (imgHeight - 60) / 3;
+            UI::Dummy(vec2(0, dummyHeight));
             UI::Text(Icons::FolderOpen);
             UI::SameLine();
             UI::PushFont(ixMenu.g_fontHeader2);
             UI::Text(itemSet.Name);
+            UI::Dummy(vec2(0, dummyHeight));
             UI::PopFont();
-            UI::PopStyleVar();
+            // UI::PopStyleVar();
             UI::Text("By " + Icons::User + " " + itemSet.Username + " | " + Icons::Heart + " " + itemSet.LikeCount + " | " + Icons::Bolt + " " + itemSet.Score + " | " + Icons::Download + " " + itemSet.Downloads);
             UI::TableSetColumnIndex(2);
             
+            UI::PushStyleVar(UI::StyleVar::FramePadding, vec2(7, imgHeight / 2 - 7));
             if (UI::GreenButton(Icons::InfoCircle)) {
                 ixMenu.AddTab(ItemSetTab(itemSet.ID), true);
             }
+            UI::PopStyleVar(1);
 
             UI::EndTable();
         }
@@ -64,17 +71,21 @@ namespace IfaceRender {
 
     // dense version is 4 rows, otherwise 7 rows
     void ItemRow(IX::Item@ item, bool dense = false) {
-        UI::Dummy(vec2(0, 7));
-        UI::Separator();
+        UI::PushStyleVar(UI::StyleVar::FramePadding, vec2(20, 20));
+        // UI::Dummy(vec2(0, 7));
+        // UI::Separator();
 
         UI::TableNextRow();
 
         UI::TableSetColumnIndex(0);
 
-        IfaceRender::Image("https://" + MXURL + "/item/icon/" + item.ID, 40);
+        UI::Dummy(vec2(0, 0));
+        UI::SameLine();
+        IfaceRender::Image("https://" + MXURL + "/item/icon/" + item.ID, 50);
 
         UI::TableNextColumn();
         
+        UI::Dummy(vec2(0,1));
         // Item Type Icon
         IfaceRender::ItemType(item);
         UI::SameLine();
@@ -87,7 +98,11 @@ namespace IfaceRender {
 
         if(!dense) {
             UI::TableNextColumn();
+            UI::AlignTextToFramePadding();
             UI::Text(item.Username);
+
+            UI::TableNextColumn();
+            UI::Text(item.Uploaded);
 
             UI::TableNextColumn();
             UI::Text(tostring(item.LikeCount));
@@ -100,10 +115,13 @@ namespace IfaceRender {
         UI::Text(tostring(item.FileSize) + ' KB');
 
         UI::TableNextColumn();
+        UI::PopStyleVar(1);
+        UI::PushStyleVar(UI::StyleVar::FramePadding, vec2(6, 20));
+        IfaceRender::ImportButton(EImportType::Item, item, 'row' + item.ID);
+        UI::SameLine();
         if (UI::GreenButton(Icons::InfoCircle)) {
             ixMenu.AddTab(ItemTab(item.ID), true);
         }
-        UI::SameLine();
-        IfaceRender::ImportButton(EImportType::Item, item, 'row' + item.ID);
+        UI::PopStyleVar(1);
     }
 }

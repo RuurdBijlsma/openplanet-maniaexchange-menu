@@ -7,7 +7,9 @@ class HomePageTab : Tab {
         if (UI::Button(Icons::KeyboardO + " \\$zContact ManiaExchange")) OpenBrowserURL("https://"+MXURL+"/messaging/compose/11");
         UI::SameLine();
         if (UI::RedButton(Icons::Heart + " \\$zSupport ManiaExchange")) OpenBrowserURL("https://trackmania.exchange/support");
-
+        
+        UI::PushStyleVar(UI::StyleVar::FramePadding, vec2(8, 4));
+        UI::AlignTextToFramePadding();
         UI::Text("Follow the ManiaExchange network on");
         UI::SameLine();
         if (UI::Button(Icons::Facebook + " Facebook")) OpenBrowserURL("https://facebook.com/maniaexchange/");
@@ -17,6 +19,7 @@ class HomePageTab : Tab {
         if (UI::Button(Icons::YoutubePlay + " YouTube")) OpenBrowserURL("https://youtube.com/maniaexchangetracks/");
         UI::SameLine();
         if (UI::Button(Icons::DiscordAlt + " Discord")) OpenBrowserURL("https://discord.mania.exchange/");
+        UI::PopStyleVar(1);
 
         UI::Separator();
 

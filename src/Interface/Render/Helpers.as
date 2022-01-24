@@ -1,11 +1,13 @@
 namespace IfaceRender {
-    void HoverImage(string url, int width) {
+    int HoverImage(string url, int width) {
         auto img = Images::CachedFromURL(url);
+        int height = 0;
         if (img.m_texture !is null){
             vec2 thumbSize = img.m_texture.GetSize();
+            height = thumbSize.y / (thumbSize.x / width);
             UI::Image(img.m_texture, vec2(
                 width,
-                thumbSize.y / (thumbSize.x / width)
+                height
             ));
             if (UI::IsItemHovered()) {
                 UI::BeginTooltip();
@@ -17,8 +19,10 @@ namespace IfaceRender {
             }
         } else {
             UI::Text(IfaceRender::GetHourGlass() + " Loading");
+            height = width - 16;
             UI::Dummy(vec2(width, width - 16));
         }
+        return height;
     }
 
     void Image(string url, int width) {
@@ -51,11 +55,19 @@ namespace IfaceRender {
         UI::EndTabBar();
     }
 
+    vec4 noTagsColor = vec4(1, 1, 1, .01);
     void Tags(IX::ItemTag@[] tags) {
-        if (tags.Length == 0) UI::Text("No tags");
+        if (tags.Length == 0){
+            IfaceRender::Tag("No tags", noTagsColor);
+        }
         else {
             for (uint i = 0; i < tags.Length; i++) {
-                if(i != 0) UI::SameLine();
+                if(i != 0) {
+                    UI::SameLine();
+                }
+                if(UI::GetCursorPos().x + 75 > UI::GetWindowSize().x) {
+                    UI::NewLine();
+                }
                 IfaceRender::ItemTag(tags[i]);
             }
         }
@@ -78,7 +90,8 @@ namespace IfaceRender {
                     IO::Delete(item.GetDestinationPath());
                     item.IsStoredLocally = false;
                     startnew(ImportFunctions::Item, data);
-                } else {
+                } 
+                if(!ixMenu.isInEditor) {
                     UI::NewLine();
                 }
                 return;
@@ -92,7 +105,7 @@ namespace IfaceRender {
         string extraText = "";
         if(!loading && showText) {
             extraText += " Import into editor";
-        }else if(loading && showText) {
+        } else if(loading && showText) {
             extraText += " Importing...";
         }
         extraText += "##" + buttonId;
@@ -104,7 +117,9 @@ namespace IfaceRender {
             } else if(importType == EImportType::Tree) {
                 startnew(ImportFunctions::Tree, data);
             }
-        } else {
+        } 
+        
+        if(!loading && !ixMenu.isInEditor) {
             UI::NewLine();
         }
         if(ixMenu.isInEditor && importType == EImportType::Tree && UI::IsItemHovered()) {

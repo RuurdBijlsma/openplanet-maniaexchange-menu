@@ -38,7 +38,6 @@ class ItemTab : Tab {
 
         UI::BeginChild("ItemImage", vec2(width, 0));
 
-        
         UI::BeginTabBar("ItemImages");
         if(UI::BeginTabItem("Icon")) {
             IfaceRender::Image("https://" + MXURL + "/item/icon/" + item.ID, width);
@@ -51,32 +50,37 @@ class ItemTab : Tab {
         UI::EndTabBar();
 
         UI::EndChild();
+
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
         UI::BeginChild("ItemHeader");
+        UI::SetCursorPos(UI::GetCursorPos() + vec2(8, 8));
+        UI::PushStyleColor(UI::Col::ChildBg, vec4(0, 0, 0, 0));
+        UI::BeginChild("PaddedItem", UI::GetContentRegionAvail() + vec2(-8, 0));
 
         UI::PushFont(ixMenu.g_fontTitle);
         UI::Text(item.Name);
         UI::PopFont();
 
-        UI::Text(Icons::Bolt + " " + item.Score + " | " + Icons::Download + " " + item.Downloads);
+        UI::PushStyleVar(UI::StyleVar::FramePadding, vec2(2, 2));
+        UI::AlignTextToFramePadding();
+        UI::Text(Icons::Heart + " " + item.LikeCount + " | " + Icons::Bolt + " " + item.Score + " | " + Icons::Download + " " + item.Downloads);
         if(item.SetID != 0){
             UI::SameLine();
-            UI::Text(" | " + Icons::Folder + " Part of set ");
+            UI::Text("| " + Icons::Folder + " Part of set ");
             
             UI::SameLine();
             auto buttonBg = vec4(0, 0, 0, 0);
-            auto hoverBg = vec4(255, 255, 255, 0.1);
+            auto hoverBg = vec4(1, 1, 1, 0.1);
             UI::PushStyleColor(UI::Col::Button, buttonBg);
             UI::PushStyleColor(UI::Col::ButtonHovered, hoverBg);
             UI::PushStyleColor(UI::Col::ButtonActive, buttonBg);
             UI::PushStyleColor(UI::Col::Text, GetColor());
-            UI::PushStyleVar(UI::StyleVar::FramePadding, vec2(0, 0));
             if(UI::Button(item.SetName)) {
                 ixMenu.AddTab(ItemSetTab(item.SetID), true);
             }
-            UI::PopStyleVar();
             UI::PopStyleColor(4);
         }
+        UI::PopStyleVar();
 
         IfaceRender::TabHeader(Icons::InfoCircle + " Information");
 
@@ -112,6 +116,7 @@ class ItemTab : Tab {
 
         if(ixMenu.isInEditor) {
             UI::Separator();
+            UI::Dummy(vec2(0, 3));
             IfaceRender::ImportButton(EImportType::Item, item, 'tab' + item.ID, true);
         }
 
@@ -120,6 +125,8 @@ class ItemTab : Tab {
             IfaceRender::IXComment(item.Description);
         }
 
+        UI::EndChild();
+        UI::PopStyleColor(1);
         UI::EndChild();
     }
 };

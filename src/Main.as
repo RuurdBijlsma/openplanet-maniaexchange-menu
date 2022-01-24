@@ -1,13 +1,14 @@
 ﻿// TODO:
 // ----------- [ higher priority ] -----------
-// bug in content tree of set 10561 very laggy
 // ----------- [ low priority ] -----------
 // Show search results in ui
-// maybe more stuff in download manager
+// make tags clickable
+// add visit set button in item row
+// date string to (6 days ago/2 years ago/today/5 months ago)
+// add setting for how directory structure should be made (completely flat/include author/include setname/use set directory)
 // ----------- [ lowest priority ] -----------
 // Support blocks
 // add import by zip?
-// add setting for how directory structure should be made (completely flat/include author/include setname/use set directory)
 
 
 IXEditor@ ixEditor = null;
@@ -17,7 +18,8 @@ void Main() {
     startnew(IX::GetAllItemTags);
     // for dev:
     sleep(100);
-    ixMenu.AddTab(ItemSetTab(10561), true);
+    // ixMenu.AddTab(ItemSetTab(11269), true);
+    // ixMenu.AddTab(ItemSetTab(11273), true);
 }
 
 void RenderMenu() {
@@ -30,7 +32,7 @@ void RenderMenu() {
     }
 }
 
-void RenderMenuMain(){
+void RenderMenuMain() {
     if(UI::BeginMenu(nameMenu + (IX::APIDown ? " \\$f00"+Icons::Server : ""))) {
         if (!IX::APIDown) {
             if(UI::MenuItem(pluginColor + Icons::WindowMaximize+"\\$z Open " + shortMXName + " menu", "", ixMenu.isOpened)) {

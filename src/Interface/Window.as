@@ -13,7 +13,7 @@ class Window {
 
     Window() {
         AddTab(HomePageTab());
-        AddTab(TestTab(), true);
+        AddTab(BrowseItemTab(), true);
     }
 
     void AddTab(Tab@ tab, bool select = false){
@@ -27,12 +27,15 @@ class Window {
         if(!isOpened) return;
         CTrackMania@ app = cast<CTrackMania>(GetApp());
         auto editor = cast<CGameCtnEditorCommon@>(app.Editor);
-        isInEditor = editor !is null;
+        isInEditor = editor !is null && app.CurrentPlayground is null;
 
-        UI::PushStyleColor(UI::Col::WindowBg,vec4(0,0,0,1));
-
+        UI::PushStyleColor(UI::Col::WindowBg, vec4(.1, .1, .1, 1));
+        UI::PushStyleVar(UI::StyleVar::WindowPadding, vec2(10, 10));
+        UI::PushStyleVar(UI::StyleVar::WindowRounding, 10.0);
+        UI::PushStyleVar(UI::StyleVar::FramePadding, vec2(10, 6));
+        UI::PushStyleVar(UI::StyleVar::WindowTitleAlign, vec2(.5, .5));
         UI::SetNextWindowSize(820, 500);
-        if(UI::Begin(nameMenu + " \\$666v"+Meta::ExecutingPlugin().Version, isOpened)){
+        if(UI::Begin(nameMenu, isOpened)){
             // Push the last active tab style so that the separator line is colored (this is drawn in BeginTabBar)
             auto lastActiveTab = c_lastActiveTab;
             if (lastActiveTab !is null) {
@@ -94,6 +97,7 @@ class Window {
             }
         }
         UI::End();
+        UI::PopStyleVar(4);
         UI::PopStyleColor(1);
     }
 };

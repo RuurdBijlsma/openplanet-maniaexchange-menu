@@ -90,6 +90,9 @@ class ItemListTab : Tab {
         StartRequest();
     }
 
+    ESearchOrder searchOrder1 = ESearchOrder::UploadDateNewest;
+    ESearchOrder searchOrder2 = ESearchOrder::None;
+    string[] sortableColumns = {"", "itemName",  "username",  "uploadDate",  "likeCount",  "score",  "fileSize", ""};
     void Render() override {
         CheckRequest();
         RenderHeader();
@@ -104,26 +107,48 @@ class ItemListTab : Tab {
                 return;
             }
             UI::BeginChild("itemList");
-            if (UI::BeginTable("List", 7)) {
-                UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 45);
-                UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch, 3);
-                UI::TableSetupColumn("By", UI::TableColumnFlags::WidthStretch, 1);
-                UI::TableSetupColumn(Icons::Trophy, UI::TableColumnFlags::WidthFixed, 40);
-                UI::TableSetupColumn(Icons::Bolt, UI::TableColumnFlags::WidthFixed, 40);
+            if (UI::BeginTable("List", 8, UI::TableFlags::Sortable | UI::TableFlags::SortMulti)) {
+                UI::AlignTextToFramePadding();
+                UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoSort, 50);
+                UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch | UI::TableColumnFlags::NoSortDescending, 3);
+                UI::TableSetupColumn("By", UI::TableColumnFlags::WidthStretch | UI::TableColumnFlags::NoSortDescending, 1);
+                UI::TableSetupColumn(Icons::CalendarO, UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::PreferSortDescending | UI::TableColumnFlags::DefaultSort, 60);
+                UI::TableSetupColumn(Icons::Heart, UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::PreferSortDescending, 40);
+                UI::TableSetupColumn(Icons::Bolt, UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::PreferSortDescending, 40);
                 UI::TableSetupColumn(Icons::Kenney::Save, UI::TableColumnFlags::WidthFixed, 70);
-                UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 70);
-                UI::TableSetupScrollFreeze(7, 1);
+                UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoSort, 70);
+                UI::TableSetupScrollFreeze(0, 1); // <-- don't work
                 UI::TableHeadersRow();
+                
                 for(uint i = 0; i < items.Length; i++) {
-                    UI::PushID("ResItem"+i);
+                    UI::PushID("ResItem" + i);
                     IX::Item@ item = items[i];
                     IfaceRender::ItemRow(item);
                     UI::PopID();
                 }
+
                 if (m_request !is null && totalItems > items.Length) {
                     UI::TableNextRow();
                     UI::TableSetColumnIndex(1);
                     UI::Text(Icons::HourglassEnd + " Loading...");
+                }
+                auto sortSpecs =  UI::TableGetSortSpecs();
+                if(sortSpecs.Dirty){
+                    searchOrder1 = ESearchOrder::None;
+                    searchOrder2 = ESearchOrder::None;
+                    for(uint i = 0; i < sortSpecs.Specs.Length; i++) {
+                        auto columnSpec = sortSpecs.Specs[i];
+                        if(columnSpec.SortOrder >= 2)
+                            continue; // only support 2 layers of sort
+                        if(columnSpec.SortOrder == 0) {
+                            searchOrder1 = GetSearchOrder(columnSpec.ColumnIndex, columnSpec.SortDirection, columnSpec.SortOrder);
+                        }
+                        if(columnSpec.SortOrder == 1) {
+                            searchOrder2 = GetSearchOrder(columnSpec.ColumnIndex, columnSpec.SortDirection, columnSpec.SortOrder);
+                        }
+                        print("Search order 1: " + tostring(searchOrder1) + ", Search order 2: " + tostring(searchOrder2));
+                    }
+                    sortSpecs.Dirty = false;
                 }
                 UI::EndTable();
                 if (m_request is null && totalItems > items.Length && UI::GreenButton("Load more")) {
@@ -133,5 +158,46 @@ class ItemListTab : Tab {
             }
             UI::EndChild();
         }
+    }
+
+    ESearchOrder GetSearchOrder(int columnIndex, UI::SortDirection direction, int priority) {
+        string colName = sortableColumns[columnIndex];
+        if(direction == UI::SortDirection::Ascending) {
+            if(colName == "itemName") {
+                return ESearchOrder::ItemNameAscending;
+            }
+            if(colName == "username") {
+                return ESearchOrder::UploaderIXUsernameAscending;
+            }
+            if(colName == "likeCount") {
+                return ESearchOrder::LikeCountAscending;
+            }
+            if(colName == "score") {
+                return ESearchOrder::ScoreAscending;
+            }
+            if(colName == "fileSize") {
+                return ESearchOrder::FileSizeAscending;
+            }
+            if(colName == "uploadDate") {
+                return ESearchOrder::UploadDateOldest;
+            }
+            return priority == 0 ? ESearchOrder::UploadDateOldest : ESearchOrder::None;
+        } 
+        if(direction == UI::SortDirection::Descending) {
+            if(colName == "likeCount") {
+                return ESearchOrder::LikeCountDescending;
+            }
+            if(colName == "score") {
+                return ESearchOrder::ScoreDescending;
+            }
+            if(colName == "fileSize") {
+                return ESearchOrder::FileSizeDescending;
+            }
+            if(colName == "uploadDate") {
+                return ESearchOrder::UploadDateNewest;
+            }
+            return priority == 0 ? ESearchOrder::UploadDateNewest : ESearchOrder::None;
+        }
+        return ESearchOrder::None;
     }
 };

@@ -10,9 +10,9 @@ namespace UI
     }
 
     bool TransparentButton(const string &in text) {
-        UI::PushStyleColor(UI::Col::Button, vec4(255, 255, 255, 0));
-        UI::PushStyleColor(UI::Col::ButtonHovered, vec4(255, 255, 255, 0.05));
-        UI::PushStyleColor(UI::Col::ButtonActive, vec4(255, 255, 255, 0.2));
+        UI::PushStyleColor(UI::Col::Button, vec4(1, 1, 1, 0));
+        UI::PushStyleColor(UI::Col::ButtonHovered, vec4(1, 1, 1, 0.05));
+        UI::PushStyleColor(UI::Col::ButtonActive, vec4(1, 1, 1, 0.2));
         bool button = UI::Button(text);
         UI::PopStyleColor(3);
         return button;
