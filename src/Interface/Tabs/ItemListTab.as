@@ -5,6 +5,11 @@ class ItemListTab : Tab {
     bool m_useRandom = false;
     int m_page = 1;
 
+    string tag = "";
+    string name = "";
+    string author = "";
+    int searchTimer = -1;
+
     dictionary@ GetRequestParams() {
         dictionary@ params = {};
         params.Set("api", "on");
@@ -94,6 +99,10 @@ class ItemListTab : Tab {
     ESearchOrder searchOrder2 = ESearchOrder::None;
     string[] sortableColumns = {"", "itemName",  "username",  "uploadDate",  "likeCount",  "score",  "fileSize", ""};
     void Render() override {
+        if(searchTimer >= 0 && searchTimer-- == 0) {
+            print("FIRE SEARCH");
+        }
+
         CheckRequest();
         RenderHeader();
 
@@ -133,7 +142,7 @@ class ItemListTab : Tab {
                     UI::Text(Icons::HourglassEnd + " Loading...");
                 }
                 auto sortSpecs =  UI::TableGetSortSpecs();
-                if(sortSpecs.Dirty){
+                if(sortSpecs.Dirty) {
                     searchOrder1 = ESearchOrder::None;
                     searchOrder2 = ESearchOrder::None;
                     for(uint i = 0; i < sortSpecs.Specs.Length; i++) {
@@ -146,8 +155,9 @@ class ItemListTab : Tab {
                         if(columnSpec.SortOrder == 1) {
                             searchOrder2 = GetSearchOrder(columnSpec.ColumnIndex, columnSpec.SortDirection, columnSpec.SortOrder);
                         }
-                        print("Search order 1: " + tostring(searchOrder1) + ", Search order 2: " + tostring(searchOrder2));
                     }
+                    print("Search order 1: " + tostring(searchOrder1) + ", Search order 2: " + tostring(searchOrder2));
+                    searchTimer = 0;
                     sortSpecs.Dirty = false;
                 }
                 UI::EndTable();

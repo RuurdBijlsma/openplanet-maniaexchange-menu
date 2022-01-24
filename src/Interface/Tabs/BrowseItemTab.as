@@ -1,12 +1,6 @@
 class BrowseItemTab : ItemListTab {
-    string tag = "";
-    string name = "";
-    string author = "";
-    int searchTimer = -1;
-
     bool IsVisible() override {return Setting_Tab_Featured_Visible;}
     string GetLabel() override {return Icons::Tree + " Items";}
-
     vec4 GetColor() override { return vec4(0.8f, 0.09f, 0.48f, 1); }
 
     dictionary@ GetRequestParams() {
@@ -30,7 +24,7 @@ class BrowseItemTab : ItemListTab {
                     string tagName = i == -1 ? '' : IX::m_itemTags[i].Name;
                     if(UI::Selectable(tagName, tag == tagName, UI::SelectableFlags::None)) {
                         print("Change tag");
-                        searchTimer = 1;
+                        searchTimer = 0;
                         tag = tagName;
                     }
                 }
@@ -53,10 +47,6 @@ class BrowseItemTab : ItemListTab {
                 author = newAuthor;
             }
             UI::EndTable();
-        }
-
-        if(searchTimer >= 0 && searchTimer-- == 0) {
-            print("FIRE SEARCH");
         }
         UI::PopStyleColor();
     }
