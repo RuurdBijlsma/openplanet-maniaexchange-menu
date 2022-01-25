@@ -10,7 +10,7 @@ Demo: https://youtu.be/Nbecs5s51EY
 ![Tags 1](https://img.shields.io/badge/dynamic/json?color=darkgreen&label=Game&query=tags%5B0%5D.name&url=https%3A%2F%2Fopenplanet.nl%2Fapi%2Ffile%2F164)
 ![Tags 3](https://img.shields.io/badge/dynamic/json?color=green&label=Type&query=tags%5B2%5D.name&url=https%3A%2F%2Fopenplanet.nl%2Fapi%2Ffile%2F164)
 
-* Access items and sets from ItemExchange in game, and import them into the editor without having to restart the game! *
+Access items and sets from ItemExchange in game, and import them into the editor without having to restart the game!
 
 ## Features
 * Search items and sets by name, author, or tag
