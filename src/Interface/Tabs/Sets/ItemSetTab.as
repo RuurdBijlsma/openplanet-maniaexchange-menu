@@ -2,6 +2,7 @@ class ItemSetTab : Tab {
     IX::ItemSet@ itemSet;
     int ID;
     EGetStatus status = EGetStatus::Downloading;
+    EGetStatus secondStatus = EGetStatus::Available;
 
     ItemSetTab(int setID){
         this.ID = setID;
@@ -33,9 +34,17 @@ class ItemSetTab : Tab {
                 @itemSet = downloader.GetSet(ID);
             }
         }
+        if(secondStatus != EGetStatus::Available) {
+            secondStatus = downloader.Check('set', ID);
+            if(secondStatus == EGetStatus::Available) {
+                print("Full itemset request finished");
+                @itemSet = downloader.GetSet(ID);
+            }
+        }
         if(itemSet.Items.Length == 0 && downloader.Check('set', ID) == EGetStatus::Available) {
             print("Making full itemset request");
             downloader.RefreshCache('set', ID);
+            secondStatus = EGetStatus::Downloading;
         }
 
         float width = UI::GetWindowSize().x * .4;

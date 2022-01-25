@@ -152,6 +152,8 @@ namespace IX {
         int32 FileSize;  //Filesize of item in KB
         array<ItemTag@> Tags = {};  	//CS list of Item tags, see Get Tags method
         bool HasThumbnail;    //Indicates whether or not the item has a custom thumbnail (see Get Item Thumbnail).
+        Time::Info uploadedDate;
+        Time::Info updatedDate;
 
         Item(const Json::Value &in json) {
             try {
@@ -172,8 +174,10 @@ namespace IX {
                 Score = json["Score"];
                 FileName = json["FileName"];
                 Uploaded = json["Uploaded"];
+                uploadedDate = ParseDateTime(Uploaded);
                 Uploaded = Uploaded.Replace("T", " ");
                 Updated = json["Updated"];
+                updatedDate = ParseDateTime(Updated);
                 Updated = Updated.Replace("T", " ");
                 SetID = json["SetID"];
                 if (json["SetName"].GetType() != Json::Type::Null) SetName = json["SetName"];
@@ -248,6 +252,8 @@ namespace IX {
         array<ItemTag@> Tags = {}; //	CS list of tags (see Get_Tags method)
         int32 ImageCount; //Amount of images that are uploaded for the Set
         dictionary@ contentTree = null;
+        Time::Info uploadedDate;
+        Time::Info updatedDate;
 
         ItemSet(const Json::Value &in json) {
             try {
@@ -264,8 +270,10 @@ namespace IX {
                 Score = json["Score"];
                 FileName = json["FileName"];
                 Uploaded = json["Uploaded"];
+                uploadedDate = ParseDateTime(Uploaded);
                 Uploaded = Uploaded.Replace("T", " ");
                 Updated = json["Updated"];
+                updatedDate = ParseDateTime(Updated);
                 Updated = Updated.Replace("T", " ");
                 Visible = json["Visible"];
                 Unreleased = json["Unreleased"];
@@ -281,6 +289,10 @@ namespace IX {
                         Items.InsertLast(Item(jItems[i]));
                 }
                 @contentTree = CreateContentTree(Items);
+
+                if(uploadedDate.Month > 12) {
+                    print("FOUT DATE: " + DateTimeToString(uploadedDate));
+                }
             } catch {
                 Name = json["Name"];
                 mxError("Error parsing ItemSet: "+Name);

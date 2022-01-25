@@ -12,6 +12,77 @@ string[] IntsToStrings(int[] input){
     return output;
 }
 
+string SecondsDifferenceToString(int seconds, bool short = true) {
+    if(seconds < 60) {
+        return seconds + (short ? "s" : " second" + (seconds == 1 ? "" : "s"));
+    }
+    int minutes = Math::Round(float(seconds) / 60);
+    if(minutes < 60) {
+        return minutes + (short ? "m" : " minute" + (minutes == 1 ? "" : "s"));
+    }
+    int hours = Math::Round(float(seconds) / 3600);
+    if(hours < 24) {
+        return hours + (short ? "h" : " hour" + (hours == 1 ? "" : "s"));
+    }
+    int days = Math::Round(float(seconds) / 86400);
+    if(days < 31) {
+        return days + " day" + (days == 1 ? "" : "s");
+    }
+    int months = Math::Round(float(seconds) / 86400 / 30.437);
+    if(months < 12) {
+        return months + " month" + (months == 1 ? "" : "s");
+    }
+    int years = Math::Round(float(seconds) / 86400 / 365.25);
+    return years + " year" + (years == 1 ? "" : "s");
+}
+
+int[] monthDurations = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+// not accurate, but good enough
+int DateTimeSubtract(const Time::Info &in dateTime1, const Time::Info &in dateTime2) { 
+    int years = dateTime1.Year - dateTime2.Year;
+    int months = dateTime1.Month - dateTime2.Month;
+    int days = dateTime1.Day - dateTime2.Day;
+    int hours = dateTime1.Hour - dateTime2.Hour;
+    int minutes = dateTime1.Minute - dateTime2.Minute;
+    int seconds = dateTime1.Second - dateTime2.Second;
+    int daysDifference = years * 365.25 + days;
+    if(months < 0)
+        for(int i = dateTime1.Month - 1; i < dateTime2.Month - 1; i++) 
+            daysDifference -= monthDurations[i];
+    else
+        for(int i = dateTime2.Month - 1; i < dateTime1.Month - 1; i++) 
+            daysDifference += monthDurations[i];
+    
+    return daysDifference * 3600 * 24 + hours * 3600 + minutes * 60 + seconds;
+}
+
+string DateTimeToString(const Time::Info &in dateTime) {
+    return dateTime.Year + "-" + dateTime.Month + "-" + dateTime.Day + " " + dateTime.Hour + ":" + dateTime.Minute + ":" + dateTime.Second;
+}
+
+Time::Info ParseDateTime(string dateTime) {
+    auto info = Time::Info();
+    auto matches = Regex::Search(dateTime, "(\\d{4})-([01]\\d)-([0-3]\\d)T([0-2]\\d):([0-5]\\d):([0-5]\\d)");
+    if(matches.Length != 7) {
+        info.Year = 1970;
+        info.Month = 1;
+        info.Day = 1;
+        info.Hour = 0;
+        info.Minute = 0;
+        info.Second = 0;
+        return info;
+    }
+    for(uint i = 1; i < matches.Length; i++) {
+        if(i == 1) info.Year = Math::Clamp(Text::ParseInt(matches[i]), 1, 5000);
+        if(i == 2) info.Month = Math::Clamp(Text::ParseInt(matches[i]), 1, 12);
+        if(i == 3) info.Day = Math::Clamp(Text::ParseInt(matches[i]), 1, 31);
+        if(i == 4) info.Hour = Math::Clamp(Text::ParseInt(matches[i]), 0, 24);
+        if(i == 5) info.Minute = Math::Clamp(Text::ParseInt(matches[i]), 0, 59);
+        if(i == 6) info.Second = Math::Clamp(Text::ParseInt(matches[i]), 0, 59);
+    }
+    return info;
+}
+
 bool IsDevMode(){
     return Meta::ExecutingPlugin().get_Type() == Meta::PluginType::Folder;
 }

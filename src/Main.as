@@ -1,15 +1,16 @@
 ﻿// TODO:
 // ----------- [ higher priority ] -----------
-// set search
+// VERY large sets don't load (too long execution)
 // ----------- [ low priority ] -----------
-// date string to (6 days ago/2 years ago/today/5 months ago)
-// add pages for top (items/sets) / (week/month)
+// make info button in itemrow/itemsetrow fully right if import button isn't there
+// add tabs for top (items/sets) / (week/month)
 // make tags clickable
 // make author clickable
 // add visit set button in item row
 // add setting for how directory structure should be made (completely flat/include author/include setname/use set directory)
 // add padding to "loading" text on item list page
 // click on item/set id to open browser with ix page
+// setting to use downloads instead of score as a metric
 // ----------- [ lowest priority ] -----------
 // Support blocks
 // add import by zip?
@@ -24,6 +25,7 @@ void Main() {
     sleep(100);
     // ixMenu.AddTab(ItemSetTab(11269), true);
     // ixMenu.AddTab(ItemSetTab(11273), true);
+    // ixMenu.AddTab(ItemTab(6033), true);
 }
 
 void RenderMenu() {

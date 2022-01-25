@@ -34,6 +34,7 @@ class DownloadManager {
     }
 
     void RefreshCache(string key, int id){
+        downloads.InsertLast(key + id);
         string[]@ ik = {tostring(id), key};
         startnew(AsyncRefreshCache, @ik);
     }
@@ -87,7 +88,6 @@ void AsyncRefreshCache(ref@ idAndKey){
     auto ik = cast<string[]@>(idAndKey);
     auto id = ik[0];
     auto key = ik[1];
-    downloader.downloads.InsertLast(key + id);
 
     auto json = API::GetAsync("https://" + MXURL + "/api/" + key + "/get_" + key + "_info/multi/" + id);
     if(json.GetType() != Json::Type::Array || json.Length == 0) {

@@ -1,42 +1,4 @@
 namespace IfaceRender {
-    void ItemSetBlock(IX::ItemSet@ itemSet) {
-        UI::Separator();
-        if(UI::BeginTable("ItemSetBlock", 3)){
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 90);
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 40);
-
-            UI::TableNextRow();
-            UI::TableSetColumnIndex(0);
-            int imgHeight = 0;
-            if(itemSet.ImageCount > 0)
-                imgHeight = IfaceRender::HoverImage("https://" + MXURL + "/set/image/" + itemSet.ID + "/1", 100);
-            // UI::AlignTextToFramePadding();
-            UI::TableSetColumnIndex(1);
-            // UI::PushStyleVar(UI::StyleVar::ItemSpacing, vec2(0, 20));
-            int dummyHeight = (imgHeight - 60) / 3;
-            UI::Dummy(vec2(0, dummyHeight));
-            UI::Text(Icons::FolderOpen);
-            UI::SameLine();
-            UI::PushFont(ixMenu.g_fontHeader2);
-            UI::Text(itemSet.Name);
-            UI::Dummy(vec2(0, dummyHeight));
-            UI::PopFont();
-            // UI::PopStyleVar();
-            UI::Text("By " + Icons::User + " " + itemSet.Username + " | " + Icons::Heart + " " + itemSet.LikeCount + " | " + Icons::Bolt + " " + itemSet.Score + " | " + Icons::Download + " " + itemSet.Downloads);
-            UI::TableSetColumnIndex(2);
-            
-            UI::PushStyleVar(UI::StyleVar::FramePadding, vec2(7, imgHeight / 2 - 7));
-            if (UI::GreenButton(Icons::InfoCircle)) {
-                ixMenu.AddTab(ItemSetTab(itemSet.ID), true);
-            }
-            UI::PopStyleVar(1);
-
-            UI::EndTable();
-        }
-        UI::Separator();
-    }
-
     void ItemBlock(IX::Item@ item) {
         UI::Separator();
         if(UI::BeginTable("ItemBlock", 3)){
@@ -102,7 +64,8 @@ namespace IfaceRender {
             UI::Text(item.Username);
 
             UI::TableNextColumn();
-            UI::Text(item.Uploaded);
+            auto diff = SecondsDifferenceToString(DateTimeSubtract(ixMenu.nowDateTime, item.uploadedDate));
+            UI::Text(diff + " ago");
 
             UI::TableNextColumn();
             UI::Text(tostring(item.LikeCount));

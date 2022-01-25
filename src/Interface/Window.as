@@ -6,6 +6,7 @@ class Window {
     Resources::Font@ g_fontHeader2 = Resources::GetFont("DroidSans-Bold.ttf", 18);
     bool isOpened = true;
     bool isInEditor = false;
+    Time::Info nowDateTime;
 
     array<Tab@> tabs;
     Tab@ activeTab;
@@ -13,7 +14,8 @@ class Window {
 
     Window() {
         AddTab(HomePageTab());
-        AddTab(BrowseItemTab(), true);
+        AddTab(BrowseItemsTab());
+        AddTab(BrowseItemSetsTab(), true);
     }
 
     void AddTab(Tab@ tab, bool select = false){
@@ -28,6 +30,7 @@ class Window {
         CTrackMania@ app = cast<CTrackMania>(GetApp());
         auto editor = cast<CGameCtnEditorCommon@>(app.Editor);
         isInEditor = editor !is null && app.CurrentPlayground is null;
+        nowDateTime = Time::Parse(Time::Stamp);
 
         UI::PushStyleColor(UI::Col::WindowBg, vec4(.1, .1, .1, 1));
         UI::PushStyleVar(UI::StyleVar::WindowPadding, vec2(10, 10));

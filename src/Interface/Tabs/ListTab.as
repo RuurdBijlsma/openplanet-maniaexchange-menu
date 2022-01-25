@@ -1,8 +1,8 @@
-class ItemListTab : Tab {
+class ListTab : Tab {
     Net::HttpRequest@ m_request;
     array<IX::Item@> items;
+    array<IX::ItemSet@> itemSets;
     uint totalItems = 0;
-    bool m_useRandom = false;
     int m_page = 1;
 
     IX::ItemTag@ emptyTag = IX::ItemTag(-1, "", "#000000");
@@ -12,6 +12,12 @@ class ItemListTab : Tab {
     int searchTimer = -1;
     ESearchOrder searchOrder1 = ESearchOrder::UploadDateNewest;
     ESearchOrder searchOrder2 = ESearchOrder::None;
+
+    bool IsItemsTab() { return true; }
+    void RenderHeader() {}
+
+    uint GetContentLength() { return IsItemsTab() ? items.Length : itemSets.Length; }
+    string GetBaseUrl() { return IsItemsTab() ? "https://" + MXURL + "/itemsearch/search" : "https://" + MXURL + "/setsearch/search"; }
 
     dictionary@ GetRequestParams() {
         dictionary@ params = {};
@@ -28,16 +34,42 @@ class ItemListTab : Tab {
             params.Set("itemname", itemName);
         }
         if(author != "") {
-            params.Set("anyauthor", author);
+            if(IsItemsTab()) {
+                params.Set("anyauthor", author);
+            } else {
+                params.Set("author", author);
+            }
         }
         if(tag.ID != -1) {
             params.Set("tags", tostring(tag.ID));
         }
-        if (m_useRandom) {
-            params.Set("random", "1");
-            m_useRandom = false;
-        }
         return params;
+    }
+
+    void HandleResponse(const Json::Value &in json) {
+        totalItems = json["totalItemCount"];
+
+        auto jsonItems = json["results"];
+        for (uint i = 0; i < jsonItems.Length; i++) {
+            if(IsItemsTab()) {
+                IX::Item@ item = IX::Item(jsonItems[i]);
+                downloader.CacheItem(item);
+                items.InsertLast(item);
+            } else {
+                IX::ItemSet@ itemSet = IX::ItemSet(jsonItems[i]);
+                downloader.CacheSet(itemSet);
+                itemSets.InsertLast(itemSet);
+            }
+        }
+    }
+
+    void Clear() {
+        if(IsItemsTab()) {
+            items.RemoveRange(0, items.Length);
+        } else {
+            itemSets.RemoveRange(0, itemSets.Length);
+        }
+        totalItems = 0;
     }
 
     void StartRequest() {
@@ -57,9 +89,9 @@ class ItemListTab : Tab {
             }
         }
 
-        string url = "https://" + MXURL + "/itemsearch/search" + urlParams;
+        string url = GetBaseUrl() + urlParams;
 
-        if (IsDevMode()) trace("ItemList::StartRequest: " + url);
+        if (IsDevMode()) trace("ListTab::StartRequest: " + url);
         @m_request = API::Get(url);
     }
 
@@ -68,7 +100,7 @@ class ItemListTab : Tab {
         if (m_request !is null && m_request.Finished()) {
             // Parse the response
             string res = m_request.String();
-            if (IsDevMode()) trace("ItemList::CheckRequest: " + res);
+            if (IsDevMode()) trace("ListTab::CheckRequest: " + res);
             @m_request = null;
             auto json = Json::Parse(res);
 
@@ -81,24 +113,6 @@ class ItemListTab : Tab {
         }
     }
 
-    void HandleResponse(const Json::Value &in json) {
-        totalItems = json["totalItemCount"];
-
-        auto jsonItems = json["results"];
-        for (uint i = 0; i < jsonItems.Length; i++) {
-            IX::Item@ item = IX::Item(jsonItems[i]);
-            downloader.CacheItem(item);
-            items.InsertLast(item);
-        }
-    }
-
-    void RenderHeader(){}
-
-    void Clear() {
-        items.RemoveRange(0, items.Length);
-        totalItems = 0;
-    }
-
     void Reload() {
         Clear();
         StartRequest();
@@ -107,8 +121,7 @@ class ItemListTab : Tab {
     string[] sortableColumns = {"", "itemName",  "username",  "uploadDate",  "likeCount",  "score",  "fileSize", ""};
     void Render() override {
         if(searchTimer >= 0 && searchTimer-- == 0) {
-            items = {};
-            StartRequest();
+            Reload();
         }
 
         CheckRequest();
@@ -120,15 +133,18 @@ class ItemListTab : Tab {
             UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoSort, 50);
             UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch | UI::TableColumnFlags::NoSortDescending, 3);
             UI::TableSetupColumn("By", UI::TableColumnFlags::WidthStretch | UI::TableColumnFlags::NoSortDescending, 1);
-            UI::TableSetupColumn(Icons::CalendarO, UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::PreferSortDescending | UI::TableColumnFlags::DefaultSort, 60);
+            UI::TableSetupColumn(Icons::CalendarO, UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::PreferSortDescending | UI::TableColumnFlags::DefaultSort, 80);
             UI::TableSetupColumn(Icons::Heart, UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::PreferSortDescending, 25);
             UI::TableSetupColumn(Icons::Bolt, UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::PreferSortDescending, 30);
             UI::TableSetupColumn(Icons::Kenney::Save, UI::TableColumnFlags::WidthFixed, 60);
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoSort, 70);
+            auto buttonsColumnWidth = IsItemsTab() ? 70 : 34;
+            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoSort, buttonsColumnWidth);
             UI::TableSetupScrollFreeze(0, 1); // <-- don't work
             UI::TableHeadersRow();
 
-            if (m_request !is null && items.Length == 0) {
+            auto contentLength = GetContentLength();
+
+            if (m_request !is null && contentLength == 0) {
                 UI::TableNextRow();
                 UI::TableSetColumnIndex(1);
                 int HourGlassValue = Time::Stamp % 3;
@@ -136,20 +152,32 @@ class ItemListTab : Tab {
                 UI::Text(Hourglass + " Loading...");
             }
 
-            if (m_request is null && items.Length == 0) {
+            if (m_request is null && contentLength == 0) {
                 UI::TableNextRow();
                 UI::TableSetColumnIndex(1);
-                UI::Text("No items found.");
+                if(IsItemsTab())
+                    UI::Text("No items found.");
+                else
+                    UI::Text("No sets found.");
             }
 
-            for(uint i = 0; i < items.Length; i++) {
-                UI::PushID("ResItem" + i);
-                IX::Item@ item = items[i];
-                IfaceRender::ItemRow(item);
-                UI::PopID();
+            if(IsItemsTab()) {
+                for(uint i = 0; i < items.Length; i++) {
+                    UI::PushID("ResItem" + i);
+                    IX::Item@ item = items[i];
+                    IfaceRender::ItemRow(item);
+                    UI::PopID();
+                }
+            } else {
+                for(uint i = 0; i < itemSets.Length; i++) {
+                    UI::PushID("ResSet" + i);
+                    IX::ItemSet@ itemSet = itemSets[i];
+                    IfaceRender::ItemSetRow(itemSet);
+                    UI::PopID();
+                }
             }
 
-            if (m_request !is null && totalItems > items.Length && items.Length > 0) {
+            if (m_request !is null && totalItems > contentLength && contentLength > 0) {
                 UI::TableNextRow();
                 UI::TableSetColumnIndex(1);
                 UI::Text(Icons::HourglassEnd + " Loading...");
@@ -174,7 +202,7 @@ class ItemListTab : Tab {
                 sortSpecs.Dirty = false;
             }
             UI::EndTable();
-            if (m_request is null && totalItems > items.Length && UI::GreenButton("Load more")) {
+            if (m_request is null && totalItems > contentLength && UI::GreenButton("Load more")) {
                 m_page++;
                 StartRequest();
             }

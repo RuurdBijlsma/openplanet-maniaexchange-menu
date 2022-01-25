@@ -1,28 +1,47 @@
 namespace IfaceRender {
-    int HoverImage(string url, int width) {
+    int HoverImage(string url, int width = 0, int height =  0) {
         auto img = Images::CachedFromURL(url);
-        int height = 0;
+        if(height == 0 && width == 0) {
+            warn("Width and height can't both be 0, aborting");
+            return 0;
+        }
+        int w = 0;
+        int h = 0;
         if (img.m_texture !is null){
             vec2 thumbSize = img.m_texture.GetSize();
-            height = thumbSize.y / (thumbSize.x / width);
-            UI::Image(img.m_texture, vec2(
-                width,
-                height
-            ));
+            if(width == 0) {
+                // calculate width
+                w = thumbSize.x / (thumbSize.y / height);
+                h = height;
+            } else {
+                // calculate height
+                w = width;
+                h = thumbSize.y / (thumbSize.x / width);
+            }
+            UI::Image(img.m_texture, vec2(w, h));
             if (UI::IsItemHovered()) {
                 UI::BeginTooltip();
                 UI::Image(img.m_texture, vec2(
-                    Draw::GetWidth() * 0.6,
-                    thumbSize.y / (thumbSize.x / (Draw::GetWidth() * 0.6))
+                    Draw::GetWidth() * 0.4,
+                    thumbSize.y / (thumbSize.x / (Draw::GetWidth() * 0.4))
                 ));
                 UI::EndTooltip();
             }
         } else {
             UI::Text(IfaceRender::GetHourGlass() + " Loading");
-            height = width - 16;
-            UI::Dummy(vec2(width, width - 16));
+            if(width == 0) {
+                UI::Dummy(vec2(height, height - 16));
+                w = height;
+                h = height;
+            } else {
+                UI::Dummy(vec2(width, width - 16));
+                w = height;
+                h = height;
+            }
         }
-        return height;
+        if(width == 0)
+            return w;
+        return h;
     }
 
     void Image(string url, int width) {

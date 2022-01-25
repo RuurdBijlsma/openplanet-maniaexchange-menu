@@ -1,12 +1,8 @@
-class BrowseItemTab : ItemListTab {
+class BrowseItemSetsTab : ListTab {
+    bool IsItemsTab() override { return false; }
     bool IsVisible() override {return Setting_Tab_Featured_Visible;}
-    string GetLabel() override {return Icons::Tree + " Items";}
-    vec4 GetColor() override { return vec4(0.8f, 0.09f, 0.48f, 1); }
-
-    dictionary@ GetRequestParams() {
-        auto params = ItemListTab::GetRequestParams();
-        return params;
-    }
+    string GetLabel() override {return Icons::FolderOpen + " Sets";}
+    vec4 GetColor() override { return vec4(0.1, .6, .05, 1); }
 
     void RenderHeader() override {
         UI::PushStyleColor(UI::Col::FrameBg , vec4(1, 1, 1, 0.03));
@@ -34,7 +30,7 @@ class BrowseItemTab : ItemListTab {
             }
 
             UI::TableSetColumnIndex(2);
-            string newName = UI::InputText("Item name", itemName, UI::InputTextFlags::None);
+            string newName = UI::InputText("Set name", itemName, UI::InputTextFlags::None);
             if(itemName != newName) {
                 print("Change name");
                 searchTimer = 60;
