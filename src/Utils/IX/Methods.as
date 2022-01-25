@@ -136,6 +136,8 @@ namespace IX {
         }
         
         try {
+            IX::ItemTag@[] tags = {};
+            string[] tagNames = {};
             for (uint i = 0; i < resNet.Length; i++)
             {
                 int tagID = resNet[i]["ID"];
@@ -143,7 +145,18 @@ namespace IX {
 
                 if (IsDevMode()) log("Loading tag #"+tagID+" - "+tagName, true);
 
-                m_itemTags.InsertLast(ItemTag(resNet[i]));
+                auto newTag = ItemTag(resNet[i]);
+                tags.InsertLast(newTag);
+                tagNames.InsertLast(newTag.Name);
+            }
+            tagNames.SortAsc();
+            for(uint i = 0; i < tagNames.Length; i++) {
+                for(uint j = 0; j < tags.Length; j++) {
+                    if(tagNames[i] == tags[j].Name) {
+                        m_itemTags.InsertLast(tags[j]);
+                        break;
+                    }
+                }
             }
 
             log(m_itemTags.Length + " tags loaded");

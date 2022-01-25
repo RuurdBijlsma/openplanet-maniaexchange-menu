@@ -1,10 +1,12 @@
 ﻿// TODO:
 // ----------- [ higher priority ] -----------
+// set search
 // ----------- [ low priority ] -----------
-// Show search results in ui
-// make tags clickable
-// add visit set button in item row
 // date string to (6 days ago/2 years ago/today/5 months ago)
+// add pages for top (items/sets) / (week/month)
+// make tags clickable
+// make author clickable
+// add visit set button in item row
 // add setting for how directory structure should be made (completely flat/include author/include setname/use set directory)
 // add padding to "loading" text on item list page
 // click on item/set id to open browser with ix page

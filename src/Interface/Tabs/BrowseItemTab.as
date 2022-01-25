@@ -19,24 +19,26 @@ class BrowseItemTab : ItemListTab {
             UI::TableNextRow();
             UI::TableSetColumnIndex(1);
 
-            if(UI::BeginCombo("Tag", tag, UI::ComboFlags::None)) {
+            if(UI::BeginCombo("Tag", tag.Name, UI::ComboFlags::None)) {
                 for(int i = -1; i < int(IX::m_itemTags.Length); i++) {
-                    string tagName = i == -1 ? '' : IX::m_itemTags[i].Name;
-                    if(UI::Selectable(tagName, tag == tagName, UI::SelectableFlags::None)) {
+                    auto iterTag = i == -1 ? emptyTag : IX::m_itemTags[i];
+                    UI::PushStyleColor(UI::Col::HeaderHovered, iterTag.VecColor);
+                    if(UI::Selectable(iterTag.Name, tag.Name == iterTag.Name, UI::SelectableFlags::None)) {
                         print("Change tag");
                         searchTimer = 0;
-                        tag = tagName;
+                        @tag = iterTag;
                     }
+                    UI::PopStyleColor(1);
                 }
                 UI::EndCombo();
             }
 
             UI::TableSetColumnIndex(2);
-            string newName = UI::InputText("Item name", name, UI::InputTextFlags::None);
-            if(name != newName) {
+            string newName = UI::InputText("Item name", itemName, UI::InputTextFlags::None);
+            if(itemName != newName) {
                 print("Change name");
                 searchTimer = 60;
-                name = newName;
+                itemName = newName;
             }
 
             UI::TableSetColumnIndex(3);

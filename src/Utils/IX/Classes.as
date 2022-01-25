@@ -292,12 +292,25 @@ namespace IX {
         int ID;
         string Name;
         string Color;
+        vec4 VecColor;
+
+        ItemTag(int id, string name, string color) {
+            ID = id;
+            Name = name;
+            Color = color;
+            if(Color == "")
+                Color = '#333333';
+            VecColor = Text::ParseHexColor(Color);
+        }
 
         ItemTag(const Json::Value &in json) {
             try {
                 ID = json["ID"];
                 Name = json["Name"];
                 Color = json["Color"];
+                if(Color == "")
+                    Color = '#333333';
+                VecColor = Text::ParseHexColor(Color);
             } catch {
                 Name = json["Name"];
                 mxError("Error parsing tag: "+Name);
