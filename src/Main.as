@@ -10,7 +10,8 @@
 // add setting for how directory structure should be made (completely flat/include author/include setname/use set directory)
 // add padding to "loading" text on item list page
 // click on item/set id to open browser with ix page
-// setting to use downloads instead of score as a metric
+// setting to use downloads instead of score or likes as a metric
+// add button to cancel ongoing import
 // ----------- [ lowest priority ] -----------
 // Support blocks
 // add import by zip?

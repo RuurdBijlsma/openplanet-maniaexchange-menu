@@ -4,7 +4,7 @@ class Window {
     Resources::Font@ g_fontBold = Resources::GetFont("DroidSans-Bold.ttf", 16);
     Resources::Font@ g_fontHeader = Resources::GetFont("DroidSans-Bold.ttf", 24);
     Resources::Font@ g_fontHeader2 = Resources::GetFont("DroidSans-Bold.ttf", 18);
-    bool isOpened = true;
+    bool isOpened = IsDevMode();
     bool isInEditor = false;
     Time::Info nowDateTime;
 
@@ -13,9 +13,9 @@ class Window {
     Tab@ c_lastActiveTab;
 
     Window() {
-        AddTab(HomePageTab());
+        AddTab(HomePageTab(), true);
         AddTab(BrowseItemsTab());
-        AddTab(BrowseItemSetsTab(), true);
+        AddTab(BrowseItemSetsTab());
     }
 
     void AddTab(Tab@ tab, bool select = false){

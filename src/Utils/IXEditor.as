@@ -229,6 +229,8 @@ class IXEditor {
     }
 
     bool LoadItem(string gbxLocation, string desiredItemLocation) {
+        if(!Permissions::OpenAdvancedMapEditor())
+            return false;
         CTrackMania@ app = cast<CTrackMania>(GetApp());
         auto editor = cast<CGameCtnEditorCommon@>(app.Editor);
         if(editor is null) {

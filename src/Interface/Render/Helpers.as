@@ -99,6 +99,11 @@ namespace IfaceRender {
 
 
     void ImportButton(EImportType importType, ref data, string buttonId, bool showText = false, bool transparentButton = false) {
+        if(!Permissions::OpenAdvancedMapEditor()) {
+            UI::NewLine();
+            return;
+        }
+
         if(importType == EImportType::Item) {
             auto item = cast<IX::Item@>(data);
             if(item.IsStoredLocally) {
