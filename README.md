@@ -1,5 +1,7 @@
 # ItemExchange plugin for Trackmania
 
+https://openplanet.nl/files/164
+
 Access items and sets from ItemExchange in game, and import them into the editor without having to restart the game!
 
 ![plugin screenshot](https://github.com/ruurdbijlsma/tm-item-exchange/blob/main/.gh/settab.png?raw=true)
