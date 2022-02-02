@@ -1,14 +1,11 @@
-# ItemExchange for Openplanet
+# ItemExchange plugin for Trackmania
 
-Demo: https://youtu.be/Nbecs5s51EY
+Access items and sets from ItemExchange in game, and import them into the editor without having to restart the game!
 
 ![plugin screenshot](https://github.com/ruurdbijlsma/tm-item-exchange/blob/main/.gh/settab.png?raw=true)
 ![plugin screenshot](https://github.com/ruurdbijlsma/tm-item-exchange/blob/main/.gh/IXScreenshot.png?raw=true)
 
-[![Version](https://img.shields.io/badge/dynamic/json?color=pink&label=Version&query=version&url=https%3A%2F%2Fopenplanet.nl%2Fapi%2Ffile%2F164)](https://openplanet.nl/files/164)
-[![Total Downloads](https://img.shields.io/badge/dynamic/json?color=green&label=Downloads&query=downloads&url=https%3A%2F%2Fopenplanet.nl%2Fapi%2Ffile%2F164)](https://openplanet.nl/files/164)
-![Tags 1](https://img.shields.io/badge/dynamic/json?color=darkgreen&label=Game&query=tags%5B0%5D.name&url=https%3A%2F%2Fopenplanet.nl%2Fapi%2Ffile%2F164)
-![Tags 3](https://img.shields.io/badge/dynamic/json?color=green&label=Type&query=tags%5B2%5D.name&url=https%3A%2F%2Fopenplanet.nl%2Fapi%2Ffile%2F164)
+[YouTube demo](https://www.youtube.com/watch?v=cBxrbqqXsrQ)
 
 Access items and sets from ItemExchange in game, and import them into the editor without having to restart the game!
 
@@ -17,3 +14,10 @@ Access items and sets from ItemExchange in game, and import them into the editor
 * Sort items by name, author, date, likes, score, or file size
 * View item and set details
 * Import items and sets straight into the editor
+
+## Changelog
+### 1.0.0
+* Initial release
+
+## Source code & issues
+Report issues and find the source code of this plugin [on GitHub](https://github.com/RuurdBijlsma/tm-item-exchange).
