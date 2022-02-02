@@ -7,7 +7,7 @@ class ListTab : Tab {
 
     IX::ItemTag@ emptyTag = IX::ItemTag(-1, "", "#000000");
     IX::ItemTag@ tag = emptyTag;
-    string itemName = "";
+    string nameQuery = "";
     string author = "";
     int searchTimer = -1;
     ESearchOrder searchOrder1 = ESearchOrder::UploadDateNewest;
@@ -30,8 +30,11 @@ class ListTab : Tab {
         params.Set("itype", tostring(int(EItemType::Ornament)));
         params.Set("collections", tostring(int(ECollection::Stadium2020)));
         params.Set("game", tostring(int(EGame::Trackmania)));
-        if(itemName != "") {
-            params.Set("itemname", itemName);
+        if(nameQuery != "") {
+            if(IsItemsTab())
+                params.Set("itemname", nameQuery);
+            else
+                params.Set("setname", nameQuery);
         }
         if(author != "") {
             if(IsItemsTab()) {

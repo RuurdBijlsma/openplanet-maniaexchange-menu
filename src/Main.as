@@ -2,6 +2,7 @@
 // ----------- [ higher priority ] -----------
 // VERY large sets don't load (too long execution)
 // ----------- [ low priority ] -----------
+// add just download button to sets? would be faster + less work probably for large sets to just restart the game after downloading
 // make info button in itemrow/itemsetrow fully right if import button isn't there
 // add tabs for top (items/sets) / (week/month)
 // make tags clickable

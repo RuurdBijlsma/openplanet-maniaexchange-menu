@@ -30,11 +30,11 @@ class BrowseItemsTab : ListTab {
             }
 
             UI::TableSetColumnIndex(2);
-            string newName = UI::InputText("Item name", itemName, UI::InputTextFlags::None);
-            if(itemName != newName) {
+            string newName = UI::InputText("Item name", nameQuery, UI::InputTextFlags::None);
+            if(nameQuery != newName) {
                 print("Change name");
                 searchTimer = 60;
-                itemName = newName;
+                nameQuery = newName;
             }
 
             UI::TableSetColumnIndex(3);

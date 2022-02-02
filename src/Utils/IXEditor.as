@@ -334,7 +334,7 @@ class IXEditor {
     }
 
     Import::Library@ GetZippedLibrary(string relativeDllPath) {
-        bool preventCache = true;
+        bool preventCache = IsDevMode();
 
         auto parts = relativeDllPath.Split("/");
         string fileName = parts[parts.Length - 1];
