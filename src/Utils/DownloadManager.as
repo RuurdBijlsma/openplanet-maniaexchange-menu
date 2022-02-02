@@ -2,11 +2,13 @@ enum EGetStatus {
     Downloading,
     Available,
     Error,
+    ItemsFailed,
 };
 
 class DownloadManager { 
     dictionary cache = {};
     string[] downloads = {};
+    int[] failedSetIds = {};
     dictionary itemDownloads = {};
 
     bool IsItemDownloaded(int id) {
@@ -40,6 +42,9 @@ class DownloadManager {
     }
 
     EGetStatus Check(string key, int id) {
+        if(key == 'set' && failedSetIds.Find(id) != -1) {
+            return EGetStatus::ItemsFailed;
+        }
         if(downloads.Find(key + id) == -1) {
             // Not downloading yet, or already finished
             if(key == 'item') {
@@ -91,13 +96,20 @@ void AsyncRefreshCache(ref@ idAndKey){
 
     auto json = API::GetAsync("https://" + MXURL + "/api/" + key + "/get_" + key + "_info/multi/" + id);
     if(json.GetType() != Json::Type::Array || json.Length == 0) {
-        downloader.cache.Set(key + id, null);
-        return;
-    }
-    if(key == 'item') {
-        downloader.CacheItem(IX::Item(json[0]));
+        int idInt = Text::ParseInt(id);
+        if(key == 'item' && downloader.GetItem(idInt) == null 
+            || key == 'set' && downloader.GetSet(idInt) == null) {
+            downloader.cache.Set(key + id, null);
+        }
+        UI::ShowNotification("Could not load full " + key + ": " + id);
+
+        downloader.failedSetIds.InsertLast(idInt);
     } else {
-        downloader.CacheSet(IX::ItemSet(json[0]));
+        if(key == 'item') {
+            downloader.CacheItem(IX::Item(json[0]));
+        } else {
+            downloader.CacheSet(IX::ItemSet(json[0]));
+        }
     }
     downloader.downloads.RemoveAt(downloader.downloads.Find(key + id));
 }

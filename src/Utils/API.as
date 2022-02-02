@@ -47,7 +47,11 @@ namespace API {
         }
 
         auto requestString = request.String();
-        print("Request string result: " + requestString);
-        return Json::Parse(requestString);
+        auto jsonResult = Json::Parse(requestString);
+        if(requestString.Length > 1000000) {
+            warn("Very big response size!");
+            return Json::Object();
+        }
+        return jsonResult;
     }
 }

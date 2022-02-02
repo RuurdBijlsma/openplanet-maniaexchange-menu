@@ -24,7 +24,8 @@ void Main() {
     @ixEditor = IXEditor();
     startnew(IX::GetAllItemTags);
     // for dev:
-    sleep(100);
+    // sleep(100);
+    // downloader.Check('set', 11197);
     // ixMenu.AddTab(ItemSetTab(11269), true);
     // ixMenu.AddTab(ItemSetTab(11273), true);
     // ixMenu.AddTab(ItemTab(6033), true);

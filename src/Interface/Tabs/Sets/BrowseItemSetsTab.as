@@ -1,6 +1,5 @@
 class BrowseItemSetsTab : ListTab {
     bool IsItemsTab() override { return false; }
-    bool IsVisible() override {return Setting_Tab_Featured_Visible;}
     string GetLabel() override {return Icons::FolderOpen + " Sets";}
     vec4 GetColor() override { return vec4(0.1, .6, .05, 1); }
 

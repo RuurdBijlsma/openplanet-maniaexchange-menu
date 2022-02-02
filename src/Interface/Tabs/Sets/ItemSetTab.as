@@ -30,11 +30,11 @@ class ItemSetTab : Tab {
                 UI::Text(IfaceRender::GetHourGlass() + " Loading...");
                 return;
             }
-            if(status == EGetStatus::Available) {
+            if(status == EGetStatus::Available || status == EGetStatus::ItemsFailed) {
                 @itemSet = downloader.GetSet(ID);
             }
         }
-        if(secondStatus != EGetStatus::Available) {
+        if(secondStatus == EGetStatus::Downloading) {
             secondStatus = downloader.Check('set', ID);
             if(secondStatus == EGetStatus::Available) {
                 print("Full itemset request finished");
@@ -115,6 +115,9 @@ class ItemSetTab : Tab {
 
         if(itemSet.contentTree !is null) {
             IfaceRender::TabHeader(Icons::FolderOpen + " Contents");
+            if(secondStatus == EGetStatus::ItemsFailed) {
+                UI::Text("Could not load contents for this set.");
+            }
             RenderTreeItems(itemSet.contentTree);
             UI::Dummy(vec2(100, 100));
         }

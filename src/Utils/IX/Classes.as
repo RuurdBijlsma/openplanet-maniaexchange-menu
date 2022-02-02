@@ -283,16 +283,12 @@ namespace IX {
                 ImageCount = json["ImageCount"];
                 Tags = ParseItemTags(json["Tags"]);
                 Items = {};
-                if (json["Items"].GetType() != Json::Type::Null) {
-                    auto jItems = json["Items"];
-                    for(uint i=0; i<jItems.Length; i++)
+                auto jItems = json["Items"];
+                if (jItems.GetType() == Json::Type::Array) {
+                    for(uint i = 0; i < jItems.Length; i++)
                         Items.InsertLast(Item(jItems[i]));
                 }
                 @contentTree = CreateContentTree(Items);
-
-                if(uploadedDate.Month > 12) {
-                    print("FOUT DATE: " + DateTimeToString(uploadedDate));
-                }
             } catch {
                 Name = json["Name"];
                 mxError("Error parsing ItemSet: "+Name);
