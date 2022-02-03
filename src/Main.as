@@ -1,9 +1,8 @@
 ﻿// TODO:
 // ----------- [ higher priority ] -----------
-// add setting for how directory structure should be made (completely flat/include author/include setname/use set directory)
-// add button to cancel ongoing import
-// ----------- [ low priority ] -----------
 // add just download button to sets? would be faster + less work probably for large sets to just restart the game after downloading
+// filter blocks from sets
+// ----------- [ low priority ] -----------
 // make info button in itemrow/itemsetrow fully right if import button isn't there
 // add tabs for top (items/sets) / (week/month)
 // make tags clickable
@@ -13,7 +12,6 @@
 // click on item/set id to open browser with ix page
 // setting to use downloads instead of score or likes as a metric
 // add import/update item from file functionality (update with hotkey?)
-// filter blocks from sets
 // ----------- [ lowest priority ] -----------
 // Support blocks
 // add import by zip?
@@ -30,6 +28,11 @@ void Main() {
     // ixMenu.AddTab(ItemSetTab(11269), true);
     // ixMenu.AddTab(ItemSetTab(11273), true);
     // ixMenu.AddTab(ItemTab(6033), true);
+}
+
+void Render() {
+    if(ixEditor !is null)
+        ixEditor.Render();
 }
 
 void RenderMenu() {

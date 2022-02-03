@@ -15,6 +15,9 @@ class IXEditor {
     string downloadFolder = '';
     int importTotal = 1;
     int importFinished = 0;
+    string statusText = "";
+    string subText = "";
+    bool importCanceled = false;
 
     IXEditor (){
         print("Getting click dll");
@@ -81,6 +84,16 @@ class IXEditor {
         }
     }
 
+    bool CleanCanceledImport() {
+        isImporting = false;
+        importFinished = 0;
+        importTotal = 1;
+        subText = "";
+        statusText = "";
+        importCanceled = false;
+        return false;
+    }
+
     bool ImportItems(IX::Item@[] items) {
         importFinished = 0;
         importTotal = items.Length;
@@ -104,8 +117,14 @@ class IXEditor {
             }
         }
 
+        subText = "Press V to cancel import";
+
+        int totalRequestsCount = requests.Length;
         // Wait for all downloads to complete
         while(true) {
+            if(importCanceled)
+                return CleanCanceledImport();
+            statusText = "Downloading [" + importFinished + " / " + totalRequestsCount + "]";
             for(int i = int(requests.Length) - 1; i >= 0; i--) {
                 auto ri = requests[i];
                 if(!ri.request.Finished())
@@ -133,30 +152,29 @@ class IXEditor {
                 continue;
             }
             string desiredItemLocation = itemFolder + item.FileName;
+            statusText = "Importing [" + (i + 1) + " / " + items.Length + "]";
             if(LoadItem(item.GetCachePath(), desiredItemLocation)) {
                 item.IsStoredLocally = true;
             } else {
                 UI::ShowNotification("Couldn't import item: " + item.Name);
             }
+            if(importCanceled)
+                return CleanCanceledImport();
             yield();
         }
 
+        subText = "";
+        statusText = "";
         isImporting = false;
         return true;
     }
 
-    void DrawText(string text) {
-        auto screenHeight = Draw::GetHeight();
-        auto screenWidth = Draw::GetWidth();
-        auto black = vec4(0, 0, 0, 1);
-        auto white = vec4(1, 1, 1, 1);
-        nvg::FontFace(ixMenu.g_fontRegularHeader);
-        nvg::FontSize(100);
-        nvg::FillColor(black);
-        nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
-        nvg::Text(screenWidth / 2 - 2, screenHeight / 4 - 2, text);
-        nvg::FillColor(white);
-        nvg::Text(screenWidth / 2, screenHeight / 4, text);
+    bool YieldAndCheckCancel() {
+        if(importCanceled) {
+            return true;
+        }
+        yield();
+        return false;
     }
 
     void EnterCreateNewItemUI(CTrackMania@ app) {
@@ -173,15 +191,13 @@ class IXEditor {
             clickFun.Call(true, xClick, yClick);
         } else {
             // make user click
-            auto maxLoops = 1000; // wait max 10 seconds for user to get to item editor
+            auto maxLoops = 2000; // wait max 20 seconds for user to get to item editor
             while(cast<CGameEditorItem>(app.Editor) is null) {
                 DrawText("Click in the map!");
-                yield();
-                if(maxLoops-- <= 0) {
+                if(YieldAndCheckCancel() || maxLoops-- <= 0) {
                     UI::ShowOverlay();
                     return;
                 }
-                print("Waiting for user click");
             }
         }
         UI::ShowOverlay();
@@ -196,7 +212,7 @@ class IXEditor {
             mousePosFun.Call(true, xClick, yClick - 1);
             auto maxLoops = 100; // wait max 1 seconds
             // Click screen until we're in "edit item" UI
-            while(true){
+            while(true) {
                 clickFun.Call(true, xClick, yClick - 2);
                 yield();
                 auto editorItem = cast<CGameEditorItem>(app.Editor);
@@ -211,11 +227,10 @@ class IXEditor {
             }
         } else {
             // make user click on item
-            auto maxLoops = 1000; // wait max 10 seconds for user to get to item editor
-            while(cast<CGameEditorItem>(app.Editor) is null){
+            auto maxLoops = 2000; // wait max 20 seconds for user to get to item editor
+            while(cast<CGameEditorItem>(app.Editor) is null) {
                 DrawText("Click the new cube!");
-                yield();
-                if(maxLoops-- <= 0) {
+                if(YieldAndCheckCancel() || maxLoops-- <= 0) {
                     UI::ShowOverlay();
                     return false;
                 }
@@ -238,14 +253,14 @@ class IXEditor {
             return false;
         }
 
-        yield();
+        if(YieldAndCheckCancel()) return false;
         // Click "create new item" button
         editor.ButtonItemNewModeOnClick();
         UI::HideOverlay();
-        yield();
+        if(YieldAndCheckCancel()) return false;
 
         EnterCreateNewItemUI(app);
-        yield();
+        if(YieldAndCheckCancel()) return false;
 
         // Save empty item to file
         auto editorItem = cast<CGameEditorItem>(app.Editor);
@@ -254,14 +269,19 @@ class IXEditor {
             return false;
         }
         editorItem.FileSaveAs();
-        yield();
-        yield();
+        
+        if(YieldAndCheckCancel()) return false;
+        
+        if(YieldAndCheckCancel()) return false;
         app.BasicDialogs.String = desiredItemLocation;
-        yield();
+        
+        if(YieldAndCheckCancel()) return false;
         app.BasicDialogs.DialogSaveAs_OnValidate();
-        yield();
+        
+        if(YieldAndCheckCancel()) return false;
         app.BasicDialogs.DialogSaveAs_OnValidate();
-        yield();
+        
+        if(YieldAndCheckCancel()) return false;
         
         // Exit "create new item" UI
         editorItem.Exit();
@@ -276,7 +296,8 @@ class IXEditor {
         
         // Wait until exited item UI
         while(cast<CGameEditorItem>(app.Editor) !is null){
-            yield();
+            
+        if(YieldAndCheckCancel()) return false;
             print("Waiting");
         }
 
@@ -284,7 +305,8 @@ class IXEditor {
         editor.ButtonItemEditModeOnClick();
         
         UI::HideOverlay();
-        yield();
+        
+        if(YieldAndCheckCancel()) return false;
         if(!EnterEditItemUI(app)) {
             error("ERROR getting to 'edit item' UI");
             return false;
@@ -294,8 +316,8 @@ class IXEditor {
         cast<CGameEditorItem>(app.Editor).Exit();
 
         // Wait until exited item UI
-        while(cast<CGameEditorItem>(app.Editor) !is null){
-            yield();
+        while(cast<CGameEditorItem>(app.Editor) !is null){  
+            if(YieldAndCheckCancel()) return false;
             print("Waiting");
         }
 
@@ -334,6 +356,11 @@ class IXEditor {
     }
 
     Import::Library@ GetZippedLibrary(string relativeDllPath) {
+        bool testNonAutomated = false;
+        if(testNonAutomated) {
+            warn("Testing non automated version");
+            return null;
+        }
         bool preventCache = IsDevMode();
 
         auto parts = relativeDllPath.Split("/");
@@ -362,5 +389,32 @@ class IXEditor {
         }
 
         return Import::GetLibrary(localDllFile);
+    }
+
+    void DrawText(string text, int yOffset = 0, int fontSize = 100) {
+        auto screenHeight = Draw::GetHeight();
+        auto screenWidth = Draw::GetWidth();
+        auto black = vec4(0, 0, 0, 1);
+        auto white = vec4(1, 1, 1, 1);
+        nvg::FontFace(ixMenu.g_fontRegularHeader);
+        nvg::FontSize(fontSize);
+        nvg::FillColor(black);
+        nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);
+        nvg::Text(screenWidth / 2 - 2, screenHeight / 4 - 2 + yOffset, text);
+        nvg::FillColor(white);
+        nvg::Text(screenWidth / 2, screenHeight / 4 + yOffset, text);
+    }
+
+    void Render() {
+        if(isImporting && UI::IsKeyPressed(UI::Key::V)) {
+            warn("Cancel import!");
+            importCanceled = true;
+        }
+        if(statusText != ''){
+            DrawText(statusText, -100, 50);
+        }
+        if(subText != ''){
+            DrawText(subText, 100, 50);
+        }
     }
 };

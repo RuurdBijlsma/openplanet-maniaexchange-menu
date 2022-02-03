@@ -222,11 +222,10 @@ namespace IX {
             if(Setting_AddPluginFolder)
                 itemFolder += Setting_PluginFolderName + '/';
             if(Setting_AddAuthorFolder)
-                itemFolder += this.Username + '/';
+                itemFolder += this.Username.Replace("/", "-") + '/';
             if(this.SetID != 0 && Setting_AddSetFolder)
-                itemFolder += this.SetName + '/';
+                itemFolder += this.SetName.Replace("/", "-") + '/';
             if(this.SetID != 0 && Setting_UseSetDirectoryStructure) {
-                // itemFolder += item.SetName.Replace('/', '-') + '/';
                 if(this.Directory != "")
                     itemFolder += this.Directory.Replace("\\", "/") + '/';
             }
