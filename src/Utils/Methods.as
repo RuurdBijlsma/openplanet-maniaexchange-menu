@@ -16,23 +16,23 @@ string SecondsDifferenceToString(int seconds, bool short = true) {
     if(seconds < 60) {
         return seconds + (short ? "s" : " second" + (seconds == 1 ? "" : "s"));
     }
-    int minutes = Math::Round(float(seconds) / 60);
+    int minutes = int(Math::Round(float(seconds) / 60));
     if(minutes < 60) {
         return minutes + (short ? "m" : " minute" + (minutes == 1 ? "" : "s"));
     }
-    int hours = Math::Round(float(seconds) / 3600);
+    int hours = int(Math::Round(float(seconds) / 3600));
     if(hours < 24) {
         return hours + (short ? "h" : " hour" + (hours == 1 ? "" : "s"));
     }
-    int days = Math::Round(float(seconds) / 86400);
+    int days = int(Math::Round(float(seconds) / 86400));
     if(days < 31) {
         return days + " day" + (days == 1 ? "" : "s");
     }
-    int months = Math::Round(float(seconds) / 86400 / 30.437);
+    int months = int(Math::Round(float(seconds) / 86400 / 30.437));
     if(months < 12) {
         return months + " month" + (months == 1 ? "" : "s");
     }
-    int years = Math::Round(float(seconds) / 86400 / 365.25);
+    int years = int(Math::Round(float(seconds) / 86400 / 365.25));
     return years + " year" + (years == 1 ? "" : "s");
 }
 
@@ -45,7 +45,7 @@ int DateTimeSubtract(const Time::Info &in dateTime1, const Time::Info &in dateTi
     int hours = dateTime1.Hour - dateTime2.Hour;
     int minutes = dateTime1.Minute - dateTime2.Minute;
     int seconds = dateTime1.Second - dateTime2.Second;
-    int daysDifference = years * 365.25 + days;
+    int daysDifference = int(years * 365.25 + days);
     if(months < 0)
         for(int i = dateTime1.Month - 1; i < dateTime2.Month - 1; i++) 
             daysDifference -= monthDurations[i];

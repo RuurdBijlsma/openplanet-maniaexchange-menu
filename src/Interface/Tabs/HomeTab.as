@@ -65,7 +65,7 @@ class HomePageTab : Tab {
 
         UI::BeginChild("Summary", vec2(width,0));
 
-        IfaceRender::Image("https://images.mania.exchange/logos/ix/square_sm.png", width);
+        IfaceRender::Image("https://images.mania.exchange/logos/ix/square_sm.png", int(width));
 
         UI::EndChild();
         UI::SetCursorPos(posTop + vec2(width + 8, 0));

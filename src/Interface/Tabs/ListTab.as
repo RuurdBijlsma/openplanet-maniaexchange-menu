@@ -22,7 +22,10 @@ class ListTab : Tab {
     dictionary@ GetRequestParams() {
         dictionary@ params = {};
         params.Set("api", "on");
-        params.Set("limit", "100");
+        string limit = "40";
+        if(IsItemsTab())
+            limit = "100";
+        params.Set("limit", limit);
         params.Set("page", tostring(m_page));
         params.Set("secord", tostring(int(searchOrder2)));
         params.Set("priord", tostring(int(searchOrder1)));
@@ -93,7 +96,6 @@ class ListTab : Tab {
 
         string url = GetBaseUrl() + urlParams;
 
-        if (IsDevMode()) trace("ListTab::StartRequest: " + url);
         @m_request = API::Get(url);
     }
 
@@ -102,7 +104,6 @@ class ListTab : Tab {
         if (m_request !is null && m_request.Finished()) {
             // Parse the response
             string res = m_request.String();
-            if (IsDevMode()) trace("ListTab::CheckRequest: " + res);
             @m_request = null;
             auto json = Json::Parse(res);
 

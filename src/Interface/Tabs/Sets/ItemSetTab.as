@@ -56,7 +56,7 @@ class ItemSetTab : Tab {
         if (itemSet.ImageCount != 0) {
             for (int i = 1; i < itemSet.ImageCount + 1; i++) {
                 if(UI::BeginTabItem(tostring(i))) {
-                    IfaceRender::HoverImage("https://" + MXURL + "/set/image/" + itemSet.ID + '/' + i, width);
+                    IfaceRender::HoverImage("https://" + MXURL + "/set/image/" + itemSet.ID + '/' + i, int(width));
                     UI::EndTabItem();
                 }
             }

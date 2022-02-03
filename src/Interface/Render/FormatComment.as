@@ -80,8 +80,7 @@ namespace IfaceRender {
         for(uint i = 0; i < itemTextParts.Length; i++) {
             if(itemTextParts[i].type == EPartType::Text) {
                 // Look for sets in text
-                auto text = itemTextParts[i].value;
-                auto setParts = text.Split('[set-');
+                auto setParts = itemTextParts[i].value.Split('[set-');
                 textParts.InsertLast(TextPart(setParts[0], EPartType::Text));
                 for(uint j = 1; j < setParts.Length; j++) {
                     auto part = setParts[j];

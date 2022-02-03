@@ -11,12 +11,12 @@ namespace IfaceRender {
             vec2 thumbSize = img.m_texture.GetSize();
             if(width == 0) {
                 // calculate width
-                w = thumbSize.x / (thumbSize.y / height);
+                w = int(thumbSize.x / (thumbSize.y / height));
                 h = height;
             } else {
                 // calculate height
                 w = width;
-                h = thumbSize.y / (thumbSize.x / width);
+                h = int(thumbSize.y / (thumbSize.x / width));
             }
             UI::Image(img.m_texture, vec2(w, h));
             if (UI::IsItemHovered()) {

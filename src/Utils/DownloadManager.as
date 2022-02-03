@@ -97,8 +97,8 @@ void AsyncRefreshCache(ref@ idAndKey){
     auto json = API::GetAsync("https://" + MXURL + "/api/" + key + "/get_" + key + "_info/multi/" + id);
     if(json.GetType() != Json::Type::Array || json.Length == 0) {
         int idInt = Text::ParseInt(id);
-        if(key == 'item' && downloader.GetItem(idInt) == null 
-            || key == 'set' && downloader.GetSet(idInt) == null) {
+        if(key == 'item' && downloader.GetItem(idInt) is null 
+            || key == 'set' && downloader.GetSet(idInt) is null) {
             downloader.cache.Set(key + id, null);
         }
         UI::ShowNotification("Could not load full " + key + ": " + id);

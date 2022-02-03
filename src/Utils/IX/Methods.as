@@ -143,7 +143,7 @@ namespace IX {
                 int tagID = resNet[i]["ID"];
                 string tagName = resNet[i]["Name"];
 
-                if (IsDevMode()) log("Loading tag #"+tagID+" - "+tagName, true);
+                // if (IsDevMode()) log("Loading tag #"+tagID+" - "+tagName, true);
 
                 auto newTag = ItemTag(resNet[i]);
                 tags.InsertLast(newTag);
@@ -158,8 +158,6 @@ namespace IX {
                     }
                 }
             }
-
-            log(m_itemTags.Length + " tags loaded");
         } catch {
             mxError("Error while loading tags");
             mxError(pluginName + " API is not responding, it must be down.", true);

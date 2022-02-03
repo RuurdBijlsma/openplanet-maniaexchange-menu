@@ -40,11 +40,11 @@ class ItemTab : Tab {
 
         UI::BeginTabBar("ItemImages");
         if(UI::BeginTabItem("Icon")) {
-            IfaceRender::Image("https://" + MXURL + "/item/icon/" + item.ID, width);
+            IfaceRender::Image("https://" + MXURL + "/item/icon/" + item.ID, int(width));
             UI::EndTabItem();
         }
         if(item.HasThumbnail && UI::BeginTabItem("Thumbnail")) {
-            IfaceRender::HoverImage("https://" + MXURL + "/item/thumbnail/" + item.ID, width);
+            IfaceRender::HoverImage("https://" + MXURL + "/item/thumbnail/" + item.ID, int(width));
             UI::EndTabItem();
         }
         UI::EndTabBar();
