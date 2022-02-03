@@ -116,15 +116,14 @@ class ItemSetTab : Tab {
         if(secondStatus == EGetStatus::ItemsFailed) {
             UI::Text("Could not load contents for this set.");
         } else if(itemSet.contentTree !is null && itemSet.Items.Length > 0) {
-            IfaceRender::TabHeader(Icons::FolderOpen + " Contents");
+            IfaceRender::TabHeader(Icons::FolderOpen + " Contents (" + itemSet.Items.Length + ")");
             IfaceRender::ImportButton(EImportType::Tree, itemSet.contentTree, "id" + ID, true);
             
             // Download set button
             UI::SameLine();
             if(ixEditor.isDownloading) UI::BeginDisabled();
             if(UI::Button(Icons::CloudDownload + " Download item set")) {
-                auto items = IX::TreeToArray(itemSet.contentTree);
-                startnew(ImportFunctions::DownloadItems, items);
+                startnew(ImportFunctions::DownloadItems, itemSet.Items);
             }
             if(ixEditor.isDownloading) UI::EndDisabled();
             if (UI::IsItemHovered()) {
