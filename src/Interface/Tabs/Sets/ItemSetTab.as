@@ -113,11 +113,11 @@ class ItemSetTab : Tab {
             IfaceRender::IXComment(itemSet.Description);
         }
 
-        if(itemSet.contentTree !is null) {
+        if(secondStatus == EGetStatus::ItemsFailed) {
+            UI::Text("Could not load contents for this set.");
+        } else if(itemSet.contentTree !is null && itemSet.Items.Length > 0) {
             IfaceRender::TabHeader(Icons::FolderOpen + " Contents");
-            if(secondStatus == EGetStatus::ItemsFailed) {
-                UI::Text("Could not load contents for this set.");
-            }
+            IfaceRender::ImportButton(EImportType::Tree, itemSet.contentTree, "id" + ID, true);
             RenderTreeItems(itemSet.contentTree);
             UI::Dummy(vec2(100, 100));
         }

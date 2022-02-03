@@ -1,5 +1,5 @@
 namespace IfaceRender {
-    int HoverImage(string url, int width = 0, int height =  0) {
+    int HoverImage(const string &in url, int width = 0, int height =  0) {
         auto img = Images::CachedFromURL(url);
         if(height == 0 && width == 0) {
             warn("Width and height can't both be 0, aborting");
@@ -44,7 +44,7 @@ namespace IfaceRender {
         return h;
     }
 
-    void Image(string url, int width) {
+    void Image(const string &in url, int width) {
         auto img = Images::CachedFromURL(url);
         if(img.m_texture !is null){
             vec2 thumbSize = img.m_texture.GetSize();
@@ -67,7 +67,7 @@ namespace IfaceRender {
         }
     }
 
-    void TabHeader(string header){
+    void TabHeader(const string &in header){
         UI::BeginTabBar(header);
         UI::BeginTabItem(header);
         UI::EndTabItem();
@@ -98,7 +98,7 @@ namespace IfaceRender {
     }
 
 
-    void ImportButton(EImportType importType, ref data, string buttonId, bool showText = false, bool transparentButton = false) {
+    void ImportButton(EImportType importType, const ref &in data, const string &in buttonId, bool showText = false, bool transparentButton = false) {
         if(!Permissions::OpenAdvancedMapEditor()) {
             UI::NewLine();
             return;

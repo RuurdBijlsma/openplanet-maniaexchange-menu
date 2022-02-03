@@ -1,6 +1,7 @@
 ﻿// TODO:
 // ----------- [ higher priority ] -----------
-// VERY large sets don't load (too long execution)
+// add setting for how directory structure should be made (completely flat/include author/include setname/use set directory)
+// add button to cancel ongoing import
 // ----------- [ low priority ] -----------
 // add just download button to sets? would be faster + less work probably for large sets to just restart the game after downloading
 // make info button in itemrow/itemsetrow fully right if import button isn't there
@@ -8,11 +9,11 @@
 // make tags clickable
 // make author clickable
 // add visit set button in item row
-// add setting for how directory structure should be made (completely flat/include author/include setname/use set directory)
 // add padding to "loading" text on item list page
 // click on item/set id to open browser with ix page
 // setting to use downloads instead of score or likes as a metric
-// add button to cancel ongoing import
+// add import/update item from file functionality (update with hotkey?)
+// filter blocks from sets
 // ----------- [ lowest priority ] -----------
 // Support blocks
 // add import by zip?

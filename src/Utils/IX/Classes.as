@@ -218,8 +218,14 @@ namespace IX {
         }
 
         string GetRelativeFolder() {
-            string itemFolder = this.Username + '/';
-            if(this.SetID != 0) {
+            string itemFolder = "";
+            if(Setting_AddPluginFolder)
+                itemFolder += Setting_PluginFolderName + '/';
+            if(Setting_AddAuthorFolder)
+                itemFolder += this.Username + '/';
+            if(this.SetID != 0 && Setting_AddSetFolder)
+                itemFolder += this.SetName + '/';
+            if(this.SetID != 0 && Setting_UseSetDirectoryStructure) {
                 // itemFolder += item.SetName.Replace('/', '-') + '/';
                 if(this.Directory != "")
                     itemFolder += this.Directory.Replace("\\", "/") + '/';
