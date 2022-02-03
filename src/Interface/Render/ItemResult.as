@@ -13,7 +13,7 @@ namespace IfaceRender {
             UI::PushStyleVar(UI::StyleVar::ItemSpacing, vec2(0, 15));
             IfaceRender::ItemType(item);
             UI::SameLine();
-            UI::PushFont(ixMenu.g_fontHeader2);
+            UI::PushFont(Fonts::fontHeader2);
             UI::Text(item.Name);
             UI::PopFont();
             UI::PopStyleVar();

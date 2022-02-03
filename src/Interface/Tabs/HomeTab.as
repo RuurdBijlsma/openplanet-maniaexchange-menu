@@ -70,10 +70,10 @@ class HomePageTab : Tab {
         UI::EndChild();
         UI::SetCursorPos(posTop + vec2(width + 8, 0));
         UI::BeginChild("Description");
-        UI::PushFont(ixMenu.g_fontTitle);
+        UI::PushFont(Fonts::fontTitle);
         UI::Text("Welcome to " + pluginName);
         UI::PopFont();
-        UI::PushFont(ixMenu.g_fontHeader2);
+        UI::PushFont(Fonts::fontHeader2);
         UI::TextDisabled("Select one of the tabs to begin.");
         UI::PopFont();
 

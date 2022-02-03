@@ -60,7 +60,7 @@ namespace IfaceRender {
     void SimpleTableRow(string[] text){
         UI::TableNextRow();
         for(uint i = 0; i < text.Length; i++) {
-            if(i == 0) UI::PushFont(ixMenu.g_fontBold);
+            if(i == 0) UI::PushFont(Fonts::fontBold);
             UI::TableSetColumnIndex(i);
             UI::Text(text[i]);
             if(i == 0) UI::PopFont();

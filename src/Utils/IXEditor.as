@@ -396,7 +396,7 @@ class IXEditor {
         auto screenWidth = Draw::GetWidth();
         auto black = vec4(0, 0, 0, 1);
         auto white = vec4(1, 1, 1, 1);
-        nvg::FontFace(ixMenu.g_fontRegularHeader);
+        nvg::FontFace(Fonts::fontRegularHeader);
         nvg::FontSize(fontSize);
         nvg::FillColor(black);
         nvg::TextAlign(nvg::Align::Center | nvg::Align::Middle);

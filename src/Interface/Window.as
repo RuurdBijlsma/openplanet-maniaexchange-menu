@@ -1,9 +1,4 @@
 class Window {
-    Resources::Font@ g_fontTitle = Resources::GetFont("Oswald-Regular.ttf", 32);
-    Resources::Font@ g_fontRegularHeader = Resources::GetFont("Oswald-Regular.ttf", 32);
-    Resources::Font@ g_fontBold = Resources::GetFont("DroidSans-Bold.ttf", 16);
-    Resources::Font@ g_fontHeader = Resources::GetFont("DroidSans-Bold.ttf", 24);
-    Resources::Font@ g_fontHeader2 = Resources::GetFont("DroidSans-Bold.ttf", 18);
     bool isOpened = IsDevMode();
     bool isInEditor = false;
     Time::Info nowDateTime;

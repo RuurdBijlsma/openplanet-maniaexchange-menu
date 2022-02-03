@@ -57,7 +57,7 @@ class ItemTab : Tab {
         UI::PushStyleColor(UI::Col::ChildBg, vec4(0, 0, 0, 0));
         UI::BeginChild("PaddedItem", UI::GetContentRegionAvail() + vec2(-8, 0));
 
-        UI::PushFont(ixMenu.g_fontTitle);
+        UI::PushFont(Fonts::fontTitle);
         UI::Text(item.Name);
         UI::PopFont();
 
@@ -103,7 +103,7 @@ class ItemTab : Tab {
             
             // tag row
             UI::TableNextRow();
-            UI::PushFont(ixMenu.g_fontBold);
+            UI::PushFont(Fonts::fontBold);
             UI::TableSetColumnIndex(0);
             UI::Text("Tags:");
             UI::PopFont();

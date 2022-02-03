@@ -71,7 +71,7 @@ class ItemSetTab : Tab {
         UI::BeginChild("PaddedItem");
         UI::Dummy(vec2(0, 1));
 
-        UI::PushFont(ixMenu.g_fontTitle);
+        UI::PushFont(Fonts::fontTitle);
         UI::Text(itemSet.Name);
         UI::PopFont();
 
@@ -94,7 +94,7 @@ class ItemSetTab : Tab {
             
             // tag row
             UI::TableNextRow();
-            UI::PushFont(ixMenu.g_fontBold);
+            UI::PushFont(Fonts::fontBold);
             UI::TableSetColumnIndex(0);
             UI::Text("Tags:");
             UI::PopFont();

@@ -18,7 +18,7 @@ namespace IfaceRender {
             UI::Dummy(vec2(0, dummyHeight));
             UI::Text(Icons::FolderOpen);
             UI::SameLine();
-            UI::PushFont(ixMenu.g_fontHeader2);
+            UI::PushFont(Fonts::fontHeader2);
             UI::Text(itemSet.Name);
             UI::Dummy(vec2(0, dummyHeight));
             UI::PopFont();
