@@ -1,6 +1,5 @@
 ﻿// TODO:
 // ----------- [ higher priority ] -----------
-// filter blocks from sets
 // ----------- [ low priority ] -----------
 // make info button in itemrow/itemsetrow fully right if import button isn't there
 // add tabs for top (items/sets) / (week/month)

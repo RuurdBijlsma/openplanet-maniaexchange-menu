@@ -159,6 +159,10 @@ class IXEditor {
             string desiredItemLocation = itemFolder + item.FileName;
             statusText = "Importing [" + (i + 1) + " / " + items.Length + "]";
             if(intoEditor) {
+                if(item.Type == EItemType::Block) {
+                    UI::ShowNotification("Importing blocks is not supported! Failed to import'" + item.Name + "'.");
+                    continue;
+                }
                 if(LoadItem(item.GetCachePath(), desiredItemLocation)) {
                     item.IsStoredLocally = true;
                 } else {
