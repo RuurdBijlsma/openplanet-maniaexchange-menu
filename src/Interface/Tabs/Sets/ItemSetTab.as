@@ -41,7 +41,6 @@ class ItemSetTab : Tab {
             }
         }
         if(itemSet.Items.Length == 0 && downloader.Check('set', ID) == EGetStatus::Available) {
-            print("Making full itemset request");
             downloader.RefreshCache('set', ID);
             secondStatus = EGetStatus::Downloading;
         }
