@@ -19,7 +19,6 @@ class IXEditor {
     bool importCanceled = false;
 
     IXEditor() {
-        print("Getting click dll");
         @lib = GetZippedLibrary("lib/libclick.dll");
         if(lib !is null) {
             @clickFun = lib.GetFunction("clickPos");
@@ -30,8 +29,6 @@ class IXEditor {
         downloadFolder = opFolder + '/IX/';
         if(!IO::FolderExists(downloadFolder))
             IO::CreateFolder(downloadFolder);
-
-        print("IX");
     }
 
     bool WaitForImport() {
@@ -122,7 +119,6 @@ class IXEditor {
                 auto ri = requests[i];
                 if(!ri.request.Finished())
                     continue;
-                print("Item " + ri.item.Name + " finished!");
                 downloadsFinished++;
                 requests.RemoveAt(i);
                 auto code = ri.request.ResponseCode();
@@ -172,7 +168,6 @@ class IXEditor {
                 auto tmItemsFolder = GetItemsFolder();
                 CreateFolderRecursive(tmItemsFolder, itemFolder);
                 auto toFile = tmItemsFolder + desiredItemLocation;
-                print("TO FILE = " + toFile);
                 CopyFile(item.GetCachePath(), toFile);
             }
             if(importCanceled)
@@ -251,7 +246,6 @@ class IXEditor {
                     UI::ShowOverlay();
                     return false;
                 }
-                print("Waiting for user click");
             }
             UI::ShowOverlay();
             return true;
@@ -306,15 +300,11 @@ class IXEditor {
         // OVERWRITE ITEM WITH ACTUAL GBX FILE
         
         auto itemLocation = GetItemsFolder() + desiredItemLocation;
-        print("itemLocation: " + itemLocation);
-        print("OVERWRITE ITEM WITH ACTUAL GBX FILE");
         CopyFile(gbxLocation, itemLocation);
         
         // Wait until exited item UI
-        while(cast<CGameEditorItem>(app.Editor) !is null){
-            
-        if(YieldAndCheckCancel()) return false;
-            print("Waiting");
+        while(cast<CGameEditorItem>(app.Editor) !is null){  
+            if(YieldAndCheckCancel()) return false;
         }
 
         // Click "edit item" button
@@ -334,16 +324,13 @@ class IXEditor {
         // Wait until exited item UI
         while(cast<CGameEditorItem>(app.Editor) !is null){  
             if(YieldAndCheckCancel()) return false;
-            print("Waiting");
         }
 
         // undo placing
-        print("UNDO");
         editor.ButtonUndoOnClick();
         editor.ButtonUndoOnClick();
         // editor.PluginMapType.Undo();
 
-        print("IX DONE");
         return true;
     }
 
@@ -386,20 +373,17 @@ class IXEditor {
         const string localDllFile = dllFolder + fileName;
 
         if(!IO::FolderExists(dllFolder)) {
-            print("Create folder: " + dllFolder);
             IO::CreateFolder(dllFolder);
         }
 
         if(preventCache || !IO::FileExists(localDllFile)) {
             try {
                 IO::FileSource zippedDll(relativeDllPath);
-                print("Copying dll from zip to local! " + localDllFile);
                 auto buffer = zippedDll.Read(zippedDll.Size());
                 IO::File toItem(localDllFile, IO::FileMode::Write);
                 toItem.Write(buffer);
                 toItem.Close();
             } catch {
-                print("Could not find dll in plugin contents");
                 return null;
             }
         }

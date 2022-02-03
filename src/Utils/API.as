@@ -1,7 +1,6 @@
 namespace API {
     Net::HttpRequest@ Get(const string &in url) {
-        print("Starting URL request: '" + url + "'");
-        
+        print("Get: '" + url + "'");
         auto request = Net::HttpRequest();
         dictionary headers = {{'Content-Type', "application/json"}};
         @request.Headers = headers;
@@ -11,7 +10,7 @@ namespace API {
         return request;
     }
     
-    bool DownloadToFile(string url, string destinationPath) {
+    bool DownloadToFile(const string &in url, const string &in destinationPath) {
         auto request = Net::HttpGet(url);
         while(!request.Finished())
             yield();
@@ -24,9 +23,8 @@ namespace API {
         return true;
     }
 
-    Json::Value GetAsync(string url) {
-        print("Requesting url: '" + url + "'");
-
+    Json::Value GetAsync(const string &in url) {
+        print("GetAsync: '" + url + "'");
         auto request = Net::HttpRequest();
         request.Url = url;
         dictionary headers = {{'Content-Type', "application/json"}};

@@ -116,8 +116,6 @@ namespace IX {
             childItems.InsertLast(item);
         }
 
-        // debug stuff
-        PrintTree(tree);
         return tree;
     }
 

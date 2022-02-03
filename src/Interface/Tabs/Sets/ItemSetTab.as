@@ -37,7 +37,6 @@ class ItemSetTab : Tab {
         if(secondStatus == EGetStatus::Downloading) {
             secondStatus = downloader.Check('set', ID);
             if(secondStatus == EGetStatus::Available) {
-                print("Full itemset request finished");
                 @itemSet = downloader.GetSet(ID);
             }
         }

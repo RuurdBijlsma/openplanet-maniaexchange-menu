@@ -76,7 +76,6 @@ class ListTab : Tab {
     }
 
     void StartRequest() {
-        print("Start request");
         auto params = GetRequestParams();
 
         string urlParams = "";
@@ -200,7 +199,6 @@ class ListTab : Tab {
                         searchOrder2 = GetSearchOrder(columnSpec.ColumnIndex, columnSpec.SortDirection, columnSpec.SortOrder);
                     }
                 }
-                print("Search order 1: " + tostring(searchOrder1) + ", Search order 2: " + tostring(searchOrder2));
                 searchTimer = 0;
                 sortSpecs.Dirty = false;
             }

@@ -19,7 +19,6 @@ class BrowseItemSetsTab : ListTab {
                     auto iterTag = i == -1 ? emptyTag : IX::m_itemTags[i];
                     UI::PushStyleColor(UI::Col::HeaderHovered, iterTag.VecColor);
                     if(UI::Selectable(iterTag.Name, tag.Name == iterTag.Name, UI::SelectableFlags::None)) {
-                        print("Change tag");
                         searchTimer = 0;
                         @tag = iterTag;
                     }
@@ -31,7 +30,6 @@ class BrowseItemSetsTab : ListTab {
             UI::TableSetColumnIndex(2);
             string newName = UI::InputText("Set name", nameQuery, UI::InputTextFlags::None);
             if(nameQuery != newName) {
-                print("Change name");
                 searchTimer = 60;
                 nameQuery = newName;
             }
@@ -39,7 +37,6 @@ class BrowseItemSetsTab : ListTab {
             UI::TableSetColumnIndex(3);
             string newAuthor = UI::InputText("Author", author, UI::InputTextFlags::None);
             if(author != newAuthor) {
-                print("Change author");
                 searchTimer = 60;
                 author = newAuthor;
             }

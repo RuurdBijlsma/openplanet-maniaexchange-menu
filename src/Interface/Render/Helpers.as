@@ -109,7 +109,6 @@ namespace IfaceRender {
             if(item.IsStoredLocally) {
                 string buttonText = Icons::Refresh + (showText ? " Update item" : "") + "##" + buttonId;
                 if(ixMenu.isInEditor && UI::RedButton(buttonText)) {
-                    print("Refresh button pressed");
                     IO::Delete(item.GetCachePath());
                     IO::Delete(item.GetDestinationPath());
                     item.IsStoredLocally = false;
@@ -172,7 +171,6 @@ enum EImportType {
 namespace ImportFunctions {
     void DownloadItems(ref@ itemsRef) {
         auto items = cast<IX::Item@[]>(itemsRef);
-        print("Download " + items.Length + " items");
         ixEditor.ImportItems(items, false, Setting_OverwriteWhenImporting);
         UI::ShowNotification("Downloaded items! restart the game to see them in the editor");
     }
@@ -186,8 +184,6 @@ namespace ImportFunctions {
     void Tree(ref@ dictRef) {
         auto tree = cast<dictionary@>(dictRef);
         auto items = IX::TreeToArray(tree);
-        print("Import " + items.Length + " items");
         ixEditor.ImportItems(items, true, Setting_OverwriteWhenImporting);
-        UI::ShowNotification("Imported items!");
     }
 }
