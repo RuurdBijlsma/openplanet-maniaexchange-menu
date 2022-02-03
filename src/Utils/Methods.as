@@ -60,7 +60,7 @@ string DateTimeToString(const Time::Info &in dateTime) {
     return dateTime.Year + "-" + dateTime.Month + "-" + dateTime.Day + " " + dateTime.Hour + ":" + dateTime.Minute + ":" + dateTime.Second;
 }
 
-Time::Info ParseDateTime(string dateTime) {
+Time::Info ParseDateTime(const string &in dateTime) {
     auto info = Time::Info();
     auto matches = Regex::Search(dateTime, "(\\d{4})-([01]\\d)-([0-3]\\d)T([0-2]\\d):([0-5]\\d):([0-5]\\d)");
     if(matches.Length != 7) {

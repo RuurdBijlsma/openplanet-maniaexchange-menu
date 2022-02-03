@@ -1,6 +1,5 @@
 ﻿// TODO:
 // ----------- [ higher priority ] -----------
-// add just download button to sets? would be faster + less work probably for large sets to just restart the game after downloading
 // filter blocks from sets
 // ----------- [ low priority ] -----------
 // make info button in itemrow/itemsetrow fully right if import button isn't there
@@ -87,7 +86,7 @@ void RenderInterface(){
     Dialogs::RenderInterface();
 }
 
-string changeEnumStyle(string enumName){
+string changeEnumStyle(const string &in enumName){
     string str = enumName.SubStr(enumName.IndexOf(":") + 1);
     str = str.Replace("_", " ");
     return str;

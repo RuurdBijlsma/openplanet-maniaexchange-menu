@@ -118,6 +118,21 @@ class ItemSetTab : Tab {
         } else if(itemSet.contentTree !is null && itemSet.Items.Length > 0) {
             IfaceRender::TabHeader(Icons::FolderOpen + " Contents");
             IfaceRender::ImportButton(EImportType::Tree, itemSet.contentTree, "id" + ID, true);
+            
+            // Download set button
+            UI::SameLine();
+            if(ixEditor.isDownloading) UI::BeginDisabled();
+            if(UI::Button(Icons::CloudDownload + " Download item set")) {
+                auto items = IX::TreeToArray(itemSet.contentTree);
+                startnew(ImportFunctions::DownloadItems, items);
+            }
+            if(ixEditor.isDownloading) UI::EndDisabled();
+            if (UI::IsItemHovered()) {
+                UI::BeginTooltip();
+                UI::Text("Download this set without importing (game restart is required to access the items)");
+                UI::EndTooltip();
+            }
+
             RenderTreeItems(itemSet.contentTree);
             UI::Dummy(vec2(100, 100));
         }

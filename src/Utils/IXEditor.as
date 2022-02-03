@@ -12,14 +12,13 @@ class IXEditor {
     Import::Function@ clickFun = null;
     Import::Function@ mousePosFun = null;
     bool isImporting = false;
+    bool isDownloading = false;
     string downloadFolder = '';
-    int importTotal = 1;
-    int importFinished = 0;
     string statusText = "";
     string subText = "";
     bool importCanceled = false;
 
-    IXEditor (){
+    IXEditor() {
         print("Getting click dll");
         @lib = GetZippedLibrary("lib/libclick.dll");
         if(lib !is null) {
@@ -85,22 +84,18 @@ class IXEditor {
     }
 
     bool CleanCanceledImport() {
+        isDownloading = false;
         isImporting = false;
-        importFinished = 0;
-        importTotal = 1;
         subText = "";
         statusText = "";
         importCanceled = false;
         return false;
     }
 
-    bool ImportItems(IX::Item@[] items) {
-        importFinished = 0;
-        importTotal = items.Length;
-
-        if(!WaitForImport()) return false;
-        isImporting = true;
-
+    bool DownloadItems(IX::Item@[] items) {
+        int downloadsFinished = 0;
+        int downloadsTotal = items.Length;
+        isDownloading = true;
         RequestItemTuple@[] requests = {};
         for(uint i = 0; i < items.Length; i++) {
             auto item = items[i];
@@ -113,24 +108,22 @@ class IXEditor {
                 requests.InsertLast(RequestItemTuple(request, item));
             } else {
                 // file already exists in downloads cache, increment counter
-                importFinished++;
+                downloadsFinished++;
             }
         }
 
-        subText = "Press V to cancel import";
-
-        int totalRequestsCount = requests.Length;
+        int totalRequestsCount = items.Length;
         // Wait for all downloads to complete
         while(true) {
             if(importCanceled)
                 return CleanCanceledImport();
-            statusText = "Downloading [" + importFinished + " / " + totalRequestsCount + "]";
+            statusText = "Downloading [" + downloadsFinished + " / " + totalRequestsCount + "]";
             for(int i = int(requests.Length) - 1; i >= 0; i--) {
                 auto ri = requests[i];
                 if(!ri.request.Finished())
                     continue;
                 print("Item " + ri.item.Name + " finished!");
-                importFinished++;
+                downloadsFinished++;
                 requests.RemoveAt(i);
                 auto code = ri.request.ResponseCode();
                 if(code < 200 || code >= 300) {
@@ -139,24 +132,44 @@ class IXEditor {
                 }
                 ri.request.SaveToFile(ri.item.GetCachePath());
             }
-            if(importFinished == importTotal) 
+            if(downloadsFinished == downloadsTotal) 
                 break;
             yield();
         }
 
+        statusText = "";
+        isDownloading = false;
+        return true;
+    }
+
+    bool ImportItems(IX::Item@[] items, bool intoEditor = true, bool overwrite = true) {
+        if(!WaitForImport()) return false;
+        isImporting = true;
+
+        subText = "Press V to cancel import";
+        if(!DownloadItems(items)) return false;
+
         for(uint i = 0; i < items.Length; i++) {
             auto item = items[i];
             auto itemFolder = item.GetRelativeFolder();
-            if(IO::FileExists(item.GetDestinationPath())){
+            if(!overwrite && IO::FileExists(item.GetDestinationPath())){
                 // file already exists in items folder
                 continue;
             }
             string desiredItemLocation = itemFolder + item.FileName;
             statusText = "Importing [" + (i + 1) + " / " + items.Length + "]";
-            if(LoadItem(item.GetCachePath(), desiredItemLocation)) {
-                item.IsStoredLocally = true;
+            if(intoEditor) {
+                if(LoadItem(item.GetCachePath(), desiredItemLocation)) {
+                    item.IsStoredLocally = true;
+                } else {
+                    UI::ShowNotification("Couldn't import item: " + item.Name);
+                }
             } else {
-                UI::ShowNotification("Couldn't import item: " + item.Name);
+                auto tmItemsFolder = GetItemsFolder();
+                CreateFolderRecursive(tmItemsFolder, itemFolder);
+                auto toFile = tmItemsFolder + desiredItemLocation;
+                print("TO FILE = " + toFile);
+                CopyFile(item.GetCachePath(), toFile);
             }
             if(importCanceled)
                 return CleanCanceledImport();
@@ -243,7 +256,7 @@ class IXEditor {
         return false;
     }
 
-    bool LoadItem(string gbxLocation, string desiredItemLocation) {
+    bool LoadItem(const string &in gbxLocation, const string &in desiredItemLocation) {
         if(!Permissions::OpenAdvancedMapEditor())
             return false;
         CTrackMania@ app = cast<CTrackMania>(GetApp());
@@ -291,8 +304,7 @@ class IXEditor {
         auto itemLocation = GetItemsFolder() + desiredItemLocation;
         print("itemLocation: " + itemLocation);
         print("OVERWRITE ITEM WITH ACTUAL GBX FILE");
-        auto copyFrom = gbxLocation;
-        CopyFile(copyFrom, itemLocation);
+        CopyFile(gbxLocation, itemLocation);
         
         // Wait until exited item UI
         while(cast<CGameEditorItem>(app.Editor) !is null){
@@ -331,7 +343,7 @@ class IXEditor {
         return true;
     }
 
-    bool CopyFile(string fromFile, string toFile, bool overwrite = true){
+    bool CopyFile(const string &in fromFile, const string &in toFile, bool overwrite = true){
         if(!IO::FileExists(fromFile)){
             warn("fromFile does not exist");
             return false;
@@ -350,12 +362,12 @@ class IXEditor {
         return true;
     }
 
-    string GetPluginName(){
+    string GetPluginName() {
         auto executingPlugin = Meta::ExecutingPlugin();
         return executingPlugin.Name;
     }
 
-    Import::Library@ GetZippedLibrary(string relativeDllPath) {
+    Import::Library@ GetZippedLibrary(const string &in relativeDllPath) {
         bool testNonAutomated = false;
         if(testNonAutomated) {
             warn("Testing non automated version");
@@ -391,7 +403,7 @@ class IXEditor {
         return Import::GetLibrary(localDllFile);
     }
 
-    void DrawText(string text, int yOffset = 0, int fontSize = 100) {
+    void DrawText(const string &in text, int yOffset = 0, int fontSize = 100) {
         auto screenHeight = Draw::GetHeight();
         auto screenWidth = Draw::GetWidth();
         auto black = vec4(0, 0, 0, 1);
@@ -406,7 +418,7 @@ class IXEditor {
     }
 
     void Render() {
-        if(isImporting && UI::IsKeyPressed(UI::Key::V)) {
+        if((isImporting || isDownloading) && UI::IsKeyPressed(UI::Key::V)) {
             warn("Cancel import!");
             importCanceled = true;
         }

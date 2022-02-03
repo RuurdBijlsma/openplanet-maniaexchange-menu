@@ -1,3 +1,6 @@
+[Setting name="Overwrite existing items when importing" category="General"]
+bool Setting_OverwriteWhenImporting = true;
+
 [Setting name="Put items in plugin folder" category="Folder structure"]
 bool Setting_AddPluginFolder = true;
 [Setting name="Plugin folder name" category="Folder structure"]

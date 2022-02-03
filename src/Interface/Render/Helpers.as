@@ -170,15 +170,24 @@ enum EImportType {
 };
 
 namespace ImportFunctions {
-    void Item(ref@ itemRef) {
-        auto item = cast<IX::Item@>(itemRef);
-        ixEditor.ImportItems({item});
+    void DownloadItems(ref@ itemsRef) {
+        auto items = cast<IX::Item@[]>(itemsRef);
+        print("Download " + items.Length + " items");
+        ixEditor.ImportItems(items, false, Setting_OverwriteWhenImporting);
+        UI::ShowNotification("Downloaded items! restart the game to see them in the editor");
     }
 
-    void Tree(ref@ dictRef){
+    void Item(ref@ itemRef) {
+        auto item = cast<IX::Item@>(itemRef);
+        ixEditor.ImportItems({item}, true, Setting_OverwriteWhenImporting);
+        UI::ShowNotification("Imported item!");
+    }
+
+    void Tree(ref@ dictRef) {
         auto tree = cast<dictionary@>(dictRef);
         auto items = IX::TreeToArray(tree);
         print("Import " + items.Length + " items");
-        ixEditor.ImportItems(items);
+        ixEditor.ImportItems(items, true, Setting_OverwriteWhenImporting);
+        UI::ShowNotification("Imported items!");
     }
 }
