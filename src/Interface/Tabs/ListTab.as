@@ -27,8 +27,9 @@ class ListTab : Tab {
             limit = "100";
         params.Set("limit", limit);
         params.Set("page", tostring(m_page));
-        params.Set("secord", tostring(int(searchOrder2)));
         params.Set("priord", tostring(int(searchOrder1)));
+        if(searchOrder2 != ESearchOrder::None)
+            params.Set("secord", tostring(int(searchOrder2)));
         // as long as only ornaments are supported, filter out blocks/other item types
         params.Set("itype", tostring(int(EItemType::Ornament)));
         params.Set("collections", tostring(int(ECollection::Stadium2020)));
@@ -75,6 +76,7 @@ class ListTab : Tab {
         } else {
             itemSets.RemoveRange(0, itemSets.Length);
         }
+        m_page = 1;
         totalItems = 0;
     }
 

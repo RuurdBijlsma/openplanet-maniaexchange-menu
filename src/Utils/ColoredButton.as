@@ -1,5 +1,4 @@
-namespace UI
-{
+namespace UI {
     bool ColoredButton(const string &in text, float h, float s = 0.6f, float v = 0.6f) {
         UI::PushStyleColor(UI::Col::Button, UI::HSV(h, s, v));
         UI::PushStyleColor(UI::Col::ButtonHovered, UI::HSV(h, s + 0.1f, v + 0.1f));
@@ -24,6 +23,4 @@ namespace UI
     bool CyanButton(const string &in text) { return ColoredButton(text, 0.5f); }
     bool PurpleButton(const string &in text) { return ColoredButton(text, 0.8f); }
     bool RoseButton(const string &in text) { return ColoredButton(text, 0.9f); }
-
-
 }

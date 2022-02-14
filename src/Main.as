@@ -10,14 +10,14 @@
 // click on item/set id to open browser with ix page
 // setting to use downloads instead of score or likes as a metric
 // add import/update item from file functionality (update with hotkey?)
-// ----------- [ lowest priority ] -----------
+// ----------- [ not possible (yet) ] -----------
 // Support blocks
-// add import by zip?
 
 
 IXEditor@ ixEditor = null;
 
 void Main() {
+    Fonts::Load();
     @ixEditor = IXEditor();
     startnew(IX::GetAllItemTags);
     // for dev:
@@ -34,6 +34,7 @@ void Render() {
 }
 
 void RenderMenu() {
+    if(!Fonts::loaded) return;
     if(UI::MenuItem(nameMenu + (IX::APIDown ? " \\$f00"+Icons::Server : ""), "", ixMenu.isOpened)) {
         if (IX::APIDown) {
             Dialogs::Message("\\$f00" + Icons::Times + " \\$zSorry, " + pluginName + " is not responding.\nReload the plugin to try again.");
@@ -44,6 +45,7 @@ void RenderMenu() {
 }
 
 void RenderMenuMain() {
+    if(!Fonts::loaded) return;
     if(UI::BeginMenu(nameMenu + (IX::APIDown ? " \\$f00"+Icons::Server : ""))) {
         if (!IX::APIDown) {
             if(UI::MenuItem(pluginColor + Icons::WindowMaximize+"\\$z Open " + shortMXName + " menu", "", ixMenu.isOpened)) {
@@ -81,6 +83,7 @@ void RenderMenuMain() {
 }
 
 void RenderInterface(){
+    if(!Fonts::loaded) return;
     ixMenu.Render();
     Dialogs::RenderInterface();
 }

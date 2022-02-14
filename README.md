@@ -18,6 +18,16 @@ Access items and sets from ItemExchange in game, and import them into the editor
 * Import items and sets straight into the editor
 
 ## Changelog
+
+### 1.0.3
+* Fix wrong page being loaded in item/set list tab
+* Improve font loading
+
+### 1.0.2
+* Change default plugin folder name
+* Fix possible font loading bug
+* Clean up code, fix warnings
+
 ### 1.0.1
 * Add setting to change item folder structure
 * Add download button to sets for when importing into editor is not desired
