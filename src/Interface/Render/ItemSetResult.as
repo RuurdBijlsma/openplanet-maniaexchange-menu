@@ -40,8 +40,6 @@ namespace IfaceRender {
     // dense version is 4 rows, otherwise 7 rows
     void ItemSetRow(IX::ItemSet@ itemSet, bool dense = false) {
         UI::PushStyleVar(UI::StyleVar::FramePadding, vec2(20, 20));
-        // UI::Dummy(vec2(0, 7));
-        // UI::Separator();
 
         UI::TableNextRow();
 

@@ -166,21 +166,32 @@ class ListTab : Tab {
                     UI::Text("No sets found.");
             }
 
+            auto viewStartY = UI::GetScrollY() - 100;
+            auto windowHeight = UI::GetWindowSize().y;
+            auto viewEndY = viewStartY + windowHeight + 200;
+            int rowHeight = 68;
+            uint hideRowsCount = Math::Max(0, int(viewStartY / rowHeight));
+            uint showRowsCount = uint((viewEndY - viewStartY) / rowHeight);
+            uint itemCount = GetContentLength();
+            if(hideRowsCount + showRowsCount > itemCount)
+                showRowsCount = itemCount - hideRowsCount;
+            UI::Dummy(vec2(50, hideRowsCount * rowHeight));
             if(IsItemsTab()) {
-                for(uint i = 0; i < items.Length; i++) {
+                for(uint i = hideRowsCount; i < hideRowsCount + showRowsCount; i++) {
                     UI::PushID("ResItem" + i);
                     IX::Item@ item = items[i];
-                    IfaceRender::ItemRow(item);
+                    IfaceRender::ItemRow(item, false);
                     UI::PopID();
                 }
             } else {
-                for(uint i = 0; i < itemSets.Length; i++) {
+                for(uint i = hideRowsCount; i < hideRowsCount + showRowsCount; i++) {
                     UI::PushID("ResSet" + i);
                     IX::ItemSet@ itemSet = itemSets[i];
-                    IfaceRender::ItemSetRow(itemSet);
+                    IfaceRender::ItemSetRow(itemSet, false);
                     UI::PopID();
                 }
             }
+            UI::Dummy(vec2(50, (itemCount - showRowsCount - hideRowsCount) * rowHeight));
 
             if (m_request !is null && totalItems > contentLength && contentLength > 0) {
                 UI::TableNextRow();
