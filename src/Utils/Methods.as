@@ -84,16 +84,9 @@ Time::Info ParseDateTime(const string &in dateTime) {
 }
 
 bool IsDevMode(){
-    return Meta::ExecutingPlugin().get_Type() == Meta::PluginType::Folder;
+    return Meta::ExecutingPlugin().Type == Meta::PluginType::Folder;
 }
 
 string GetItemsFolder() {
-    auto documents = IO::FromDataFolder("").Split('/Openplanet')[0] + "\\Documents";
-    string itemsFolder;
-    if(IO::FolderExists(documents + "\\Trackmania2020")) {
-        itemsFolder = documents + "\\Trackmania2020\\Items\\";
-    } else {
-        itemsFolder = documents + "\\Trackmania\\Items\\";
-    }
-    return itemsFolder.Replace("\\", "/");
+    return IO::FromUserGameFolder("items/");
 }

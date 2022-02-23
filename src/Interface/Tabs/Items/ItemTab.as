@@ -85,8 +85,8 @@ class ItemTab : Tab {
         IfaceRender::TabHeader(Icons::InfoCircle + " Information");
 
         if(UI::BeginTable("InfoColumns", 2)) {
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 125);
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
+            UI::TableSetupColumn("##infoleft", UI::TableColumnFlags::WidthFixed, 125);
+            UI::TableSetupColumn("##inforight", UI::TableColumnFlags::WidthStretch, 1);
 
             IfaceRender::SimpleTableRow({"Item ID:", tostring(item.ID)});
             IfaceRender::SimpleTableRow({"Uploaded by:", item.Username});

@@ -135,7 +135,7 @@ class ListTab : Tab {
         UI::BeginChild("itemList", vec2(), false, UI::WindowFlags::AlwaysVerticalScrollbar);
         if (UI::BeginTable("List", 8, UI::TableFlags::Sortable | UI::TableFlags::SortMulti)) {
             UI::AlignTextToFramePadding();
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoSort, 50);
+            UI::TableSetupColumn("##img", UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoSort, 50);
             UI::TableSetupColumn("Name", UI::TableColumnFlags::WidthStretch | UI::TableColumnFlags::NoSortDescending, 3);
             UI::TableSetupColumn("By", UI::TableColumnFlags::WidthStretch | UI::TableColumnFlags::NoSortDescending, 1);
             UI::TableSetupColumn(Icons::CalendarO, UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::PreferSortDescending | UI::TableColumnFlags::DefaultSort, 80);
@@ -143,7 +143,7 @@ class ListTab : Tab {
             UI::TableSetupColumn(Icons::Bolt, UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::PreferSortDescending, 30);
             UI::TableSetupColumn(Icons::Kenney::Save, UI::TableColumnFlags::WidthFixed, 60);
             auto buttonsColumnWidth = IsItemsTab() ? 70 : 34;
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoSort, buttonsColumnWidth);
+            UI::TableSetupColumn("##buttons", UI::TableColumnFlags::WidthFixed | UI::TableColumnFlags::NoSort, buttonsColumnWidth);
             UI::TableSetupScrollFreeze(0, 1); // <-- don't work
             UI::TableHeadersRow();
 
@@ -166,32 +166,20 @@ class ListTab : Tab {
                     UI::Text("No sets found.");
             }
 
-            auto viewStartY = UI::GetScrollY() - 100;
-            auto windowHeight = UI::GetWindowSize().y;
-            auto viewEndY = viewStartY + windowHeight + 200;
-            int rowHeight = 68;
-            uint hideRowsCount = Math::Max(0, int(viewStartY / rowHeight));
-            uint showRowsCount = uint((viewEndY - viewStartY) / rowHeight);
-            uint itemCount = GetContentLength();
-            if(hideRowsCount + showRowsCount > itemCount)
-                showRowsCount = itemCount - hideRowsCount;
-            UI::Dummy(vec2(50, hideRowsCount * rowHeight));
-            if(IsItemsTab()) {
-                for(uint i = hideRowsCount; i < hideRowsCount + showRowsCount; i++) {
+            UI::ListClipper clipper(GetContentLength());
+            while(clipper.Step()) {
+                for(int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
                     UI::PushID("ResItem" + i);
-                    IX::Item@ item = items[i];
-                    IfaceRender::ItemRow(item, false);
-                    UI::PopID();
-                }
-            } else {
-                for(uint i = hideRowsCount; i < hideRowsCount + showRowsCount; i++) {
-                    UI::PushID("ResSet" + i);
-                    IX::ItemSet@ itemSet = itemSets[i];
-                    IfaceRender::ItemSetRow(itemSet, false);
+                    if(IsItemsTab()) {
+                        IX::Item@ item = items[i];
+                        IfaceRender::ItemRow(item, false);
+                    } else {
+                        IX::ItemSet@ itemSet = itemSets[i];
+                        IfaceRender::ItemSetRow(itemSet, false);
+                    }
                     UI::PopID();
                 }
             }
-            UI::Dummy(vec2(50, (itemCount - showRowsCount - hideRowsCount) * rowHeight));
 
             if (m_request !is null && totalItems > contentLength && contentLength > 0) {
                 UI::TableNextRow();

@@ -7,10 +7,10 @@ class BrowseItemsTab : ListTab {
         UI::PushStyleColor(UI::Col::FrameBg , vec4(1, 1, 1, 0.03));
         UI::Dummy(vec2(0, 0));
         if(UI::BeginTable("Filters", 4)) {
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 0);
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
+            UI::TableSetupColumn("##browse1", UI::TableColumnFlags::WidthFixed, 0);
+            UI::TableSetupColumn("##browse2", UI::TableColumnFlags::WidthStretch, 1);
+            UI::TableSetupColumn("##browse3", UI::TableColumnFlags::WidthStretch, 1);
+            UI::TableSetupColumn("##browse4", UI::TableColumnFlags::WidthStretch, 1);
             UI::TableNextRow();
             UI::TableSetColumnIndex(1);
 

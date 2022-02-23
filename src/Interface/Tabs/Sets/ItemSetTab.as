@@ -80,8 +80,8 @@ class ItemSetTab : Tab {
         IfaceRender::TabHeader(Icons::InfoCircle + " Information");
 
         if(UI::BeginTable("InfoColumns", 2)) {
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 125);
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
+            UI::TableSetupColumn("##info2left", UI::TableColumnFlags::WidthFixed, 125);
+            UI::TableSetupColumn("##info2right", UI::TableColumnFlags::WidthStretch, 1);
 
             IfaceRender::SimpleTableRow({"Set ID:", tostring(itemSet.ID)});
             IfaceRender::SimpleTableRow({"Uploaded by:", itemSet.Username});
@@ -156,10 +156,10 @@ class ItemSetTab : Tab {
                 }
                 Indent(level);
                 if (UI::BeginTable("List", 4)) {
-                    UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 45);
-                    UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 3);
-                    UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 45);
-                    UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 70);
+                    UI::TableSetupColumn("##ist1" + id + "|" + keys[i] + "|" + level, UI::TableColumnFlags::WidthFixed, 45);
+                    UI::TableSetupColumn("##ist2" + id + "|" + keys[i] + "|" + level, UI::TableColumnFlags::WidthStretch, 3);
+                    UI::TableSetupColumn("##ist3" + id + "|" + keys[i] + "|" + level, UI::TableColumnFlags::WidthFixed, 45);
+                    UI::TableSetupColumn("##ist4" + id + "|" + keys[i] + "|" + level, UI::TableColumnFlags::WidthFixed, 70);
                     for(uint j = 0; j < items.Length; j++){
                         Indent(level);
                         IfaceRender::ItemRow(items[j], true);

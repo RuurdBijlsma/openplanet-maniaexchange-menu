@@ -2,9 +2,9 @@ namespace IfaceRender {
     void ItemBlock(IX::Item@ item) {
         UI::Separator();
         if(UI::BeginTable("ItemBlock", 3)){
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 50);
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthStretch, 1);
-            UI::TableSetupColumn("", UI::TableColumnFlags::WidthFixed, 75);
+            UI::TableSetupColumn("##1" + item.ID, UI::TableColumnFlags::WidthFixed, 50);
+            UI::TableSetupColumn("##2" + item.ID, UI::TableColumnFlags::WidthStretch, 1);
+            UI::TableSetupColumn("##3" + item.ID, UI::TableColumnFlags::WidthFixed, 75);
 
             UI::TableNextRow();
             UI::TableSetColumnIndex(0);
