@@ -254,6 +254,8 @@ class IXEditor {
         return false;
     }
 
+    // gbxLocation: absolute path to item.gbx file
+    // desiredItemLocation: relative path where it should be put (relative to Trackmania/Items/)
     bool LoadItem(const string &in gbxLocation, const string &in desiredItemLocation) {
         if(!Permissions::OpenAdvancedMapEditor())
             return false;

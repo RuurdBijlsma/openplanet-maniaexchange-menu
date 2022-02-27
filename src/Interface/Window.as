@@ -1,4 +1,5 @@
 class Window {
+    // bool isOpened = false;
     bool isOpened = IsDevMode();
     bool isInEditor = false;
     Time::Info nowDateTime;
@@ -8,9 +9,11 @@ class Window {
     Tab@ c_lastActiveTab;
 
     Window() {
+        // for dev make home page not default
         AddTab(HomePageTab(), true);
         AddTab(BrowseItemsTab());
         AddTab(BrowseItemSetsTab());
+        AddTab(WorkTab());
     }
 
     void AddTab(Tab@ tab, bool select = false){
