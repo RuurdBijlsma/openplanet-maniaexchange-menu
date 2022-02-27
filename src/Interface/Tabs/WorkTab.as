@@ -187,13 +187,11 @@ namespace Work {
             for(uint j = 0; j < parts.Length - 1; j++) {
                 auto folder = parts[j];
                 dictionary@ childNode;
-                print("Folder: " + folder);
                 if(node.Get(folder, @childNode)) {
                     // use existing dict for this folder
                     @node = childNode;
                 } else {
                     failed = true;
-                    print("Failed for path: " + path);
                     break;
                 }
             }
@@ -223,12 +221,10 @@ namespace Work {
             string tmpPath = path + ".tmp";
             IO::Move(path, tmpPath);
             if(ixEditor.LoadItem(tmpPath, relPath)) {
-                print("load success: Delete tmp: " + tmpPath);
                 IO::Delete(tmpPath);
                 unloadedItems.RemoveAt(i);
                 importedItems.InsertLast(relPath);
             } else {
-                print("load failed: Move back tmp: " + tmpPath);
                 IO::Move(tmpPath, path);
             }
         }
