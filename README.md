@@ -14,7 +14,9 @@ Access items and sets from ItemExchange in game, and import them into the editor
 
 Now when the plugin loads it should use the dll to enable automatic importing (no clicks needed)
 
-Check if the dll is loaded in the home tab of the plugin in game, there should be a ✅
+Check if the dll is loaded in the home tab of the plugin in game, there should be a ✅.
+
+If you don't trust my dll you can compile it yourself: https://github.com/RuurdBijlsma/send-input-lib
 
 ## Features
 * Search items and sets by name, author, or tag
