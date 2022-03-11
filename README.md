@@ -12,6 +12,7 @@ Access items and sets from ItemExchange in game, and import them into the editor
 1. Download the dll from https://github.com/RuurdBijlsma/tm-item-exchange/blob/main/lib/libclick.dll
 2. Place the .dll file in C:/Users/Name/OpenplanetNext/lib/libclick.dll
 3. Now when the plugin loads it should use the dll to enable automatic importing (no clicks needed)
+4. Check if the dll is loaded in the home tab of the plugin in game, there should be a ✅
 
 ## Features
 * Search items and sets by name, author, or tag
