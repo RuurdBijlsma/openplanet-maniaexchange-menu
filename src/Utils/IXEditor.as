@@ -366,7 +366,7 @@ class IXEditor {
             warn("Testing non automated version");
             return null;
         }
-        bool preventCache = IsDevMode();
+        bool preventCache = false;
 
         auto parts = relativeDllPath.Split("/");
         string fileName = parts[parts.Length - 1];

@@ -1,6 +1,6 @@
 class Window {
-    // bool isOpened = false;
-    bool isOpened = IsDevMode();
+    // bool isOpened = IsDevMode();
+    bool isOpened = false;
     bool isInEditor = false;
     Time::Info nowDateTime;
 
