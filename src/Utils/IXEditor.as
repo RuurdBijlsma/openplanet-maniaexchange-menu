@@ -277,15 +277,25 @@ class IXEditor {
 
         // Save empty item to file
         auto editorItem = cast<CGameEditorItem>(app.Editor);
-        if(editorItem is null){
+        if(editorItem is null) {
             warn("Editor item is null");
             return false;
         }
         editorItem.FileSaveAs();
         
         if(YieldAndCheckCancel()) return false;
-        
         if(YieldAndCheckCancel()) return false;
+
+        int maxUps = 10;
+        while(app.BasicDialogs.DialogSaveAs_Path != "") {
+            print("Doing hierarchy up, because path = " + app.BasicDialogs.DialogSaveAs_Path);
+            app.BasicDialogs.DialogSaveAs_HierarchyUp();
+            if(maxUps-- <= 0) {
+                warn("Couldn't find item save path.");
+                return false;
+            }
+        }
+
         app.BasicDialogs.String = desiredItemLocation;
         
         if(YieldAndCheckCancel()) return false;
@@ -302,6 +312,12 @@ class IXEditor {
         // OVERWRITE ITEM WITH ACTUAL GBX FILE
         
         auto itemLocation = GetItemsFolder() + desiredItemLocation;
+        if(!IO::FileExists(itemLocation)) {
+            // temp item wasn't created correctly
+            warn("Temporary item wasn't created correctly!");
+            warn("Item Location: " + itemLocation);
+            return false;
+        }
         CopyFile(gbxLocation, itemLocation);
         
         // Wait until exited item UI
