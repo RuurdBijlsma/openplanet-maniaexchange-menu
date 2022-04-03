@@ -345,14 +345,13 @@ class IXEditor {
         }
 
         // undo placing
-        editor.ButtonUndoOnClick();
-        editor.ButtonUndoOnClick();
-        // editor.PluginMapType.Undo();
+        editor.PluginMapType.Undo();
+        editor.PluginMapType.Undo();
 
         return true;
     }
 
-    bool CopyFile(const string &in fromFile, const string &in toFile, bool overwrite = true){
+    bool CopyFile(const string &in fromFile, const string &in toFile, bool overwrite = true) {
         if(!IO::FileExists(fromFile)){
             warn("fromFile does not exist");
             return false;
