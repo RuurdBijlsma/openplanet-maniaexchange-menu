@@ -1,11 +1,6 @@
-$compress = @{
-    Path = "./Oswald-Regular.ttf", "./info.toml", "./src"
-    CompressionLevel = "Fastest"
-    DestinationPath = "../ItemExchange.zip"
-}
-Compress-Archive @compress -Force
+$Name = Split-Path -Path $pwd -Leaf
 
-Move-Item -Path "../ItemExchange.zip" -Destination "../ItemExchange.op" -Force
+7z a -tzip "../$Name.op" info.toml src Oswald-Regular.ttf
 
 Write-Host("Done!")
 $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
