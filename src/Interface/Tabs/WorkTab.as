@@ -18,7 +18,7 @@ class WorkTab : Tab {
         UI::BeginChild("WorkContent");
         UI::PushTextWrapPos(UI::GetContentRegionAvail().x);
 
-        UI::Text("Import items from your " + GetItemsFolder() + " that aren't loaded in the editor yet.");
+        UI::Text("Import items from " + GetItemsFolder() + " that aren't loaded in the editor yet.");
         UI::TextDisabled("This can be used for loading custom items you created with the NadeoImporter.");
 
         if(!ixMenu.isInEditor) {

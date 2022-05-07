@@ -110,7 +110,12 @@ class ListTab : Tab {
             auto json = Json::Parse(res);
 
             // Handle the response
-            if (json.HasKey("error")) {
+            if(json.GetType() != Json::Type::Object) {
+                error("Result from GET request is not an object");
+                UI::ShowNotification("ItemExchange search", "Invalid response, maybe ItemExchange is down?");
+            } else if (json.HasKey("error")) {
+                error("Result from GET request has error");
+                UI::ShowNotification("ItemExchange search", "Error in search result :(");
                 // HandleErrorResponse(json["error"]);
             } else {
                 HandleResponse(json);
