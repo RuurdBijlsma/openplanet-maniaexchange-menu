@@ -3,11 +3,10 @@ name = "ItemExchange"
 author = "RuteNL"
 category = "TMX"
 siteid = 164
-perms = "paid"
 
-version = "1.1.6"
+version = "1.1.7"
 
 [script]
-imports = [ "Permissions.as", "Formatting.as", "Dialogs.as" ]
+imports = [ "Dialogs.as" ]
 exports = [ "src/Exports/Export.as" ]
 timeout = 5000

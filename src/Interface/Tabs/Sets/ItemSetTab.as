@@ -15,6 +15,8 @@ class ItemSetTab : Tab {
             return "\\$f00" + Icons::Times + " \\$zError";
         if (status == EGetStatus::Downloading) 
             return Icons::Database + " Loading...";
+        if(status == EGetStatus::ItemsFailed)
+            return "\\$f00" + Icons::Times + " \\$zSet failed to load";
         return Icons::Database + " " + itemSet.Name;
     }
     vec4 GetColor() override { return pluginColorVec; }
@@ -28,6 +30,10 @@ class ItemSetTab : Tab {
             }
             if(status == EGetStatus::Downloading) {
                 UI::Text(IfaceRender::GetHourGlass() + " Loading...");
+                return;
+            }
+            if(status == EGetStatus::ItemsFailed) {
+                UI::Text("\\$f00" + Icons::Times + " \\$zSet failed to load");
                 return;
             }
             if(status == EGetStatus::Available || status == EGetStatus::ItemsFailed) {
@@ -139,13 +145,13 @@ class ItemSetTab : Tab {
         UI::EndChild();
     }
     
-    void RenderContentTree(string name, const dictionary &in tree, int level = 0, string id = "") {
+    void RenderContentTree(const string &in name, const dictionary &in tree, int level = 0, const string &in id = "") {
         if(UI::CollapsingHeader(name + "##" + id)) {
             RenderTreeItems(tree, level, id);
         }
     }
 
-    void RenderTreeItems(const dictionary &in tree, int level = 0, string id = "") {
+    void RenderTreeItems(const dictionary &in tree, int level = 0, const string &in id = "") {
         auto keys = tree.GetKeys();
         for(uint i = 0; i < keys.Length; i++) {
             if(keys[i] == IX::TreeItemsKey) {

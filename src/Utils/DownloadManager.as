@@ -35,13 +35,13 @@ class DownloadManager {
         }
     }
 
-    void RefreshCache(string key, int id){
+    void RefreshCache(const string &in key, int id){
         downloads.InsertLast(key + id);
         string[]@ ik = {tostring(id), key};
         startnew(AsyncRefreshCache, @ik);
     }
 
-    EGetStatus Check(string key, int id) {
+    EGetStatus Check(const string &in key, int id) {
         if(key == 'set' && failedSetIds.Find(id) != -1) {
             return EGetStatus::ItemsFailed;
         }

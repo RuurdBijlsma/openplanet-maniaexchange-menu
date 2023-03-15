@@ -98,7 +98,7 @@ namespace Work {
     }
 
     
-    void PrintLoadedItems(const dictionary &in tree, string indent = ""){
+    void PrintLoadedItems(const dictionary &in tree, const string &in indent = ""){
         auto keys = tree.GetKeys();
         for(uint i = 0; i < keys.Length; i++) {
             if(keys[i].StartsWith("art")) {
@@ -122,7 +122,7 @@ namespace Work {
         }
     }
 
-    void SetLoadedArticle(string path) {
+    void SetLoadedArticle(const string &in path) {
         string[] parts = string(path).Split('\\');
         string articleName = parts[parts.Length - 1];
         string key = 'art' + articleName;

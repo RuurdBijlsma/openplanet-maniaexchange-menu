@@ -46,8 +46,9 @@ namespace API {
 
         auto requestString = request.String();
         auto jsonResult = Json::Parse(requestString);
-        if(requestString.Length > 1000000) {
-            warn("Very big response size!");
+        // support for way too many transitions:
+        if(requestString.Length > 15000000) {
+            warn("Very big response size! " + requestString.Length);
             return Json::Object();
         }
         return jsonResult;

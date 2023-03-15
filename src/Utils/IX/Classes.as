@@ -1,5 +1,5 @@
 namespace IX {
-    void PrintTree(const dictionary &in tree, string indent = ""){
+    void PrintTree(const dictionary &in tree, const string &in indent = ""){
         auto keys = tree.GetKeys();
         for(uint i = 0; i < keys.Length; i++) {
 
@@ -160,7 +160,7 @@ namespace IX {
                 UserID = json["UserID"];
                 Username = json["Username"];
                 if (json["Description"].GetType() != Json::Type::Null) Description = json["Description"];
-                if (json["AuthorLogin"].GetType() != Json::Type::Null) AuthorLogin = json["AuthorLogin"];
+                if (json.HasKey("AuthorLogin") && json["AuthorLogin"].GetType() != Json::Type::Null) AuthorLogin = json["AuthorLogin"];
                 if (json["OriginalBlock"].GetType() != Json::Type::Null) OriginalBlock = json["OriginalBlock"];
                 Type = EItemType(int(json["Type"]));
                 TypeName = json["TypeName"];
@@ -182,7 +182,7 @@ namespace IX {
                 if (json["Directory"].GetType() != Json::Type::Null) Directory = json["Directory"];
                 if (json["ZipIndex"].GetType() != Json::Type::Null) ZipIndex = json["ZipIndex"];
                 Visible = json["Visible"];
-                if (json["Unlisted"].GetType() == Json::Type::Boolean) Unlisted = json["Unlisted"];
+                if (json.HasKey("Unlisted") && json["Unlisted"].GetType() != Json::Type::Null) Unlisted = json["Unlisted"];
                 Unreleased = json["Unreleased"];
                 LikeCount = json["LikeCount"];
                 CommentCount = json["CommentCount"];
@@ -305,7 +305,7 @@ namespace IX {
         string Color;
         vec4 VecColor;
 
-        ItemTag(int id, string name, string color) {
+        ItemTag(int id, const string &in name, const string &in color) {
             ID = id;
             Name = name;
             Color = color;

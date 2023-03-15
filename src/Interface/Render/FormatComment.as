@@ -3,29 +3,29 @@ namespace IfaceRender {
     class TextPart {
         string value;
         EPartType type;
-        TextPart(string value, EPartType type){
+        TextPart(const string &in value, EPartType type){
             this.value = value;
             this.type = type;
         }
     };
 
-    void IXComment(string comment){
+    void IXComment(const string &in comment){
         string formatted = "";
 
         formatted =
-        comment.Replace("[tmx]", "Trackmania\\$075Exchange\\$z")
-            .Replace("[mx]", "Mania\\$09FExchange\\$z")
-            .Replace("[b]", "")
-            .Replace("[/b]", "")
-            .Replace("[i]", "")
-            .Replace("[/i]", "")
-            .Replace("[u]", "__")
-            .Replace("[/u]", "__")
-            .Replace("[s]", "~~")
-            .Replace("[/s]", "~~")
-            .Replace("[hr]", "")
-            .Replace("[list]", "")
-            .Replace("[/list]", "");
+            comment.Replace("[tmx]", "Trackmania\\$075Exchange\\$z")
+                .Replace("[mx]", "Mania\\$09FExchange\\$z")
+                .Replace("[b]", "")
+                .Replace("[/b]", "")
+                .Replace("[i]", "")
+                .Replace("[/i]", "")
+                .Replace("[u]", "__")
+                .Replace("[/u]", "__")
+                .Replace("[s]", "~~")
+                .Replace("[/s]", "~~")
+                .Replace("[hr]", "")
+                .Replace("[list]", "")
+                .Replace("[/list]", "");
 
         // url regex replacement: https://regex101.com/r/UcN0NN/1
         formatted = Regex::Replace(formatted, "\\[url=([^\\]]*)\\]([^\\[]*)\\[\\/url\\]", "[$2]($1)");
@@ -133,8 +133,12 @@ namespace IfaceRender {
                     }
                 } else if (getStatus == EGetStatus::Available) {
                     IfaceRender::ItemSetBlock(downloader.GetSet(itemSetID));
+                } else if (getStatus == EGetStatus::ItemsFailed) {
+                    if(UI::OrangeButton(Icons::ExclamationTriangle + " Set " + part.value)) {
+                        ixMenu.AddTab(ItemSetTab(itemSetID), true);
+                    }
                 }
-            } else{
+            } else {
                 auto trimmedText = part.value.Trim();
                 if(trimmedText.Length > 0) 
                     UI::Markdown(trimmedText);

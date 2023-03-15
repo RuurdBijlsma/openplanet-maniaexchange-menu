@@ -10,4 +10,4 @@ bool Setting_AddAuthorFolder = false;
 [Setting name="Put items in folder named after the set" category="Folder structure"]
 bool Setting_AddSetFolder = true;
 [Setting name="Make use of the directory structure in the item set" category="Folder structure"]
-bool Setting_UseSetDirectoryStructure = false;
+bool Setting_UseSetDirectoryStructure = true;
