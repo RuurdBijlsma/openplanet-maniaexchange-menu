@@ -47,10 +47,11 @@ class ListTab : Tab {
                 params.Set("collections", tostring(int(collection)));
                 params.Set("game", tostring(int(EGame::Maniaplanet)));
             }
-        #endif
+        #elif TMNEXT
         params.Set("itype", tostring(int(EItemType::Ornament)));
         params.Set("collections", tostring(int(ECollection::Stadium2020)));
         params.Set("game", tostring(int(EGame::Trackmania)));
+        #endif
         if(nameQuery != "") {
             if(IsItemsTab())
                 params.Set("itemname", nameQuery);
