@@ -31,6 +31,23 @@ class ListTab : Tab {
         if(searchOrder2 != ESearchOrder::None)
             params.Set("secord", tostring(int(searchOrder2)));
         // as long as only ornaments are supported, filter out blocks/other item types
+        #if MP4
+        CGameManiaPlanet@ app = cast<CGameManiaPlanet>(GetApp());
+            if (app.LoadedManiaTitle !is null) {
+                string base = app.LoadedManiaTitle.BaseTitleId;
+                ECollection collection = (base == "SMStorm") ? ECollection::Storm : (base == "TMCanyon") ? ECollection::Canyon : (base == "TMValley") ? ECollection::Valley : (base == "TMStadium") ? ECollection::Stadium : (base == "TMLagoon") ? ECollection::Lagoon : ECollection::Common;
+                params.Set("itype", tostring(int(EItemType::Ornament)));
+                params.Set("collections", tostring(int(collection)));
+                params.Set("game", tostring(int(EGame::Maniaplanet)));
+            }
+            else 
+            {
+                ECollection collection = ECollection::Common;
+                params.Set("itype", tostring(int(EItemType::Ornament)));
+                params.Set("collections", tostring(int(collection)));
+                params.Set("game", tostring(int(EGame::Maniaplanet)));
+            }
+        #endif
         params.Set("itype", tostring(int(EItemType::Ornament)));
         params.Set("collections", tostring(int(ECollection::Stadium2020)));
         params.Set("game", tostring(int(EGame::Trackmania)));
