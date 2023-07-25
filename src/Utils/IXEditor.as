@@ -274,6 +274,10 @@ class IXEditor {
     // gbxLocation: absolute path to item.gbx file
     // desiredItemLocation: relative path where it should be put (relative to Trackmania/Items/)
     bool LoadItem(const string &in gbxLocation, const string &in desiredItemLocation) {
+#if TMNEXT
+        if(!Permissions::OpenAdvancedMapEditor())
+            return false;
+#endif
         CTrackMania@ app = cast<CTrackMania>(GetApp());
         auto editor = cast<CGameCtnEditorCommon@>(app.Editor);
         if(editor is null) {
