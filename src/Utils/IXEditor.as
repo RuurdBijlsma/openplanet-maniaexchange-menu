@@ -190,8 +190,10 @@ class IXEditor {
     }
 
     void EnterCreateNewItemUI(CTrackMania@ app) {
+#if MP4
         CGameManiaPlanet@ baseApp = cast<CGameManiaPlanet>(GetApp());
         string base = baseApp.LoadedManiaTitle.BaseTitleId;
+#endif
         if(mousePosFun !is null && clickFun !is null) {
             auto screenHeight = Draw::GetHeight();
             auto screenWidth = Draw::GetWidth();
@@ -203,6 +205,7 @@ class IXEditor {
             mousePosFun.Call(xClick, yClick - 1);
             yield();
             clickFun.Call(true, xClick, yClick);
+#if MP4
             yield();
             if (base == "SMStorm") 
             {
@@ -211,6 +214,7 @@ class IXEditor {
             {
                 clickFun.Call(true, xClick, yClick + 30);
             }
+#endif
         } else {
             // make user click
             auto maxLoops = 2000; // wait max 20 seconds for user to get to item editor
@@ -263,7 +267,8 @@ class IXEditor {
             }
             UI::ShowOverlay();
         }
-        return true;
+
+        return false;
     }
 
     // gbxLocation: absolute path to item.gbx file
