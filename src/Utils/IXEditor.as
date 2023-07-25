@@ -235,7 +235,11 @@ class IXEditor {
             auto maxLoops = 100; // wait max 1 seconds
             // Click screen until we're in "edit item" UI
             while(true) {
+#if MP4
                 clickFun.Call(true, xClick, yClick - (maxLoops - 50));
+#else
+                clickFun.call(true, xClick, yClick - 2);
+#endif
                 yield();
                 auto editorItem = cast<CGameEditorItem>(app.Editor);
                 if(editorItem !is null){
