@@ -150,7 +150,7 @@ class IXEditor {
             auto itemFolder = item.GetRelativeFolder();
             if(!overwrite && IO::FileExists(item.GetDestinationPath())){
                 // file already exists in items folder
-                continue;
+                continue; 
             }
             string desiredItemLocation = itemFolder + item.FileName;
             statusText = "Importing [" + (i + 1) + " / " + items.Length + "]";
@@ -190,6 +190,8 @@ class IXEditor {
     }
 
     void EnterCreateNewItemUI(CTrackMania@ app) {
+        CGameManiaPlanet@ baseApp = cast<CGameManiaPlanet>(GetApp());
+        string base = baseApp.LoadedManiaTitle.BaseTitleId;
         if(mousePosFun !is null && clickFun !is null) {
             auto screenHeight = Draw::GetHeight();
             auto screenWidth = Draw::GetWidth();
@@ -201,10 +203,18 @@ class IXEditor {
             mousePosFun.Call(xClick, yClick - 1);
             yield();
             clickFun.Call(true, xClick, yClick);
+            yield();
+            if (base == "SMStorm") 
+            {
+                clickFun.Call(true, xClick, yClick);
+            } else 
+            {
+                clickFun.Call(true, xClick, yClick + 30);
+            }
         } else {
             // make user click
             auto maxLoops = 2000; // wait max 20 seconds for user to get to item editor
-            while(cast<CGameEditorItem>(app.Editor) is null) {
+            while (cast<CGameEditorItem>(app.Editor) is null) {
                 DrawText("Click in the map!");
                 if(YieldAndCheckCancel() || maxLoops-- <= 0) {
                     UI::ShowOverlay();
@@ -225,7 +235,7 @@ class IXEditor {
             auto maxLoops = 100; // wait max 1 seconds
             // Click screen until we're in "edit item" UI
             while(true) {
-                clickFun.Call(true, xClick, yClick - 2);
+                clickFun.Call(true, xClick, yClick - (maxLoops - 50));
                 yield();
                 auto editorItem = cast<CGameEditorItem>(app.Editor);
                 if(editorItem !is null){
@@ -248,17 +258,13 @@ class IXEditor {
                 }
             }
             UI::ShowOverlay();
-            return true;
         }
-
-        return false;
+        return true;
     }
 
     // gbxLocation: absolute path to item.gbx file
     // desiredItemLocation: relative path where it should be put (relative to Trackmania/Items/)
     bool LoadItem(const string &in gbxLocation, const string &in desiredItemLocation) {
-        if(!Permissions::OpenAdvancedMapEditor())
-            return false;
         CTrackMania@ app = cast<CTrackMania>(GetApp());
         auto editor = cast<CGameCtnEditorCommon@>(app.Editor);
         if(editor is null) {
@@ -269,7 +275,9 @@ class IXEditor {
         if(YieldAndCheckCancel()) return false;
         // Click "create new item" button
         editor.ButtonItemNewModeOnClick();
+        
         UI::HideOverlay();
+
         if(YieldAndCheckCancel()) return false;
 
         EnterCreateNewItemUI(app);
@@ -327,9 +335,9 @@ class IXEditor {
 
         // Click "edit item" button
         editor.ButtonItemEditModeOnClick();
-        
+
         UI::HideOverlay();
-        
+
         if(YieldAndCheckCancel()) return false;
         if(!EnterEditItemUI(app)) {
             error("ERROR getting to 'edit item' UI");
