@@ -242,7 +242,7 @@ class IXEditor {
 #if MP4
                 clickFun.Call(true, xClick, yClick - (maxLoops - 50));
 #else
-                clickFun.call(true, xClick, yClick - 2);
+                clickFun.Call(true, xClick, yClick - 2);
 #endif
                 yield();
                 auto editorItem = cast<CGameEditorItem>(app.Editor);
