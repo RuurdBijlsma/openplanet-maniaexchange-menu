@@ -241,6 +241,7 @@ class IXEditor {
             while(true) {
 #if MP4
                 clickFun.Call(true, xClick, yClick - (maxLoops - 50));
+                cast<CGameCtnEditorCommon>(cast<CGameManiaPlanet>(app).Editor).ButtonZoomInOnClick();
 #else
                 clickFun.call(true, xClick, yClick - 2);
 #endif
