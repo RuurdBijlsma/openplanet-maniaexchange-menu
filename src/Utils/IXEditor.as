@@ -266,7 +266,7 @@ class IXEditor {
                 }
             }
             UI::ShowOverlay();
-            return true;9
+            return true;
         }
 
         return false;
