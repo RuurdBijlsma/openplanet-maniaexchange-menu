@@ -16,6 +16,7 @@ class BrowseItemsTab : ListTab {
 
             if(UI::BeginCombo("Tag", tag.Name, UI::ComboFlags::None)) {
                 for(int i = -1; i < int(IX::m_itemTags.Length); i++) {
+                    UI::PushID("itemTag" + i);
                     auto iterTag = i == -1 ? emptyTag : IX::m_itemTags[i];
                     UI::PushStyleColor(UI::Col::HeaderHovered, iterTag.VecColor);
                     if(UI::Selectable(iterTag.Name, tag.Name == iterTag.Name, UI::SelectableFlags::None)) {
@@ -23,6 +24,7 @@ class BrowseItemsTab : ListTab {
                         @tag = iterTag;
                     }
                     UI::PopStyleColor(1);
+                    UI::PopID();
                 }
                 UI::EndCombo();
             }
