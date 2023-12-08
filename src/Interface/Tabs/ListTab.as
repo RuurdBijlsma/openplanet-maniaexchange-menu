@@ -24,7 +24,7 @@ class ListTab : Tab {
         params.Set("api", "on");
         string limit = "40";
         if(IsItemsTab())
-            limit = "100";
+            limit = "50";
         params.Set("limit", limit);
         params.Set("page", tostring(m_page));
         params.Set("priord", tostring(int(searchOrder1)));
