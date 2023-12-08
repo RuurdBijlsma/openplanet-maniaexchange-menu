@@ -48,7 +48,7 @@ class HomePageTab : Tab {
             }
             UI::EndTooltip();
         }
-        if (UI::Button(Icons::Kenney::GithubAlt + " Github")) OpenBrowserURL(repoURL);
+        if (UI::Button(Icons::Kenney::GithubAlt + " GitHub")) OpenBrowserURL(repoURL);
         UI::SameLine();
         if (UI::Button(Icons::Heartbeat + " Plugin Home")) OpenBrowserURL("https://openplanet.nl/files/" + executingPlugin.SiteID);
         
